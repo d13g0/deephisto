@@ -1,3 +1,6 @@
+"""
+Allows creating a network definition programatically.
+"""
 import caffe
 from caffe import layers as L, params as P
 from caffe.coord_map import crop
