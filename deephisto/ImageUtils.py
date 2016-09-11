@@ -37,11 +37,11 @@ class ImageUtils:
 
     @staticmethod
     def image_to_unscaled_rgb(data):  #  used for creating UNSCALED PNG images (for example histological maps)
-        w, h = im.shape
+        w, h = data.shape
         ret = np.empty((w, h, 3), dtype=np.uint8)
-        ret[:, :, 0] = im
-        ret[:, :, 1] = im
-        ret[:, :, 2] = im
+        ret[:, :, 0] = data
+        ret[:, :, 1] = data
+        ret[:, :, 2] = data
         return ret
 
     @staticmethod
@@ -162,7 +162,14 @@ class ImageUtils:
         print 'Creating Input Images PNGs'
         for k, vol in enumerate(volumes):
             for i in range(num_slices):
+                #mind  = vol[:,:,i].min()
+                #maxd  = vol[:,:,i].max()
+
                 imslice = ImageUtils.image_to_rgb(vol[:,:,i])
+                #mina = imslice[:, :, 0].min()
+                #maxa = imslice[:, :, 0].max()
+
+                #print self.locations.LABELS[k], ' min %f' % mind, ' max %f' % maxd,'  min after %f'%mina, ' max after %f'%maxa
 
                 im = Image.fromarray(imslice)
                 im.save(self.locations.PNG_TEMPLATE%(i,self.locations.LABELS[k]))

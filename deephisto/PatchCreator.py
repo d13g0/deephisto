@@ -1,4 +1,4 @@
-
+import numpy as np
 import Image
 import os, shutil
 from .PatchSampler import PatchSampler
@@ -14,7 +14,7 @@ class PatchCreator:
         self.pimages = []
 
 
-    def create_patches(self, subject, index):
+    def create_patches(self, subject, index, cleardir=False,coverage=30):
         """
         :param subject:    The subject
         :param index:       The current slice
@@ -31,9 +31,10 @@ class PatchCreator:
             print 'Creating directory %s'%utils.locations.PATCHES_DIR
         else:
             #  Empty directory first
-            print Console.WARNING + utils.locations.PATCHES_DIR + ' exists. Emptying the directory before creating new patches' + Console.ENDC
-            shutil.rmtree(utils.locations.PATCHES_DIR)
-            os.makedirs(utils.locations.PATCHES_DIR)
+            if (cleardir):
+                print Console.WARNING + utils.locations.PATCHES_DIR + ' exists. Emptying the directory before creating new patches' + Console.ENDC
+                shutil.rmtree(utils.locations.PATCHES_DIR)
+                os.makedirs(utils.locations.PATCHES_DIR)
 
 
 
@@ -48,7 +49,7 @@ class PatchCreator:
         self.pimages.append(Image.fromarray(histo))
 
         sampler = PatchSampler(bmask)
-        selected = sampler.sample(PatchSampler.S_MONTECARLO,params={'C':30})
+        selected = sampler.sample(PatchSampler.S_MONTECARLO,params={'C':coverage})
 
 
         count = 0
@@ -60,26 +61,44 @@ class PatchCreator:
         print '-----------------------------------------------------------'
 
     def _extract_patch(self, x, y):
-        """
-        1. Create rectangle centered in x,y
-        2. Load set of png images in the PIL format to crop using the rectangle
-        3. Use
-        """
 
         filename = self.utils.locations.PATCH_TEMPLATE
 
         L = len(self.pimages)-1
+
+        samples = []
 
         for i in range(L):
             label = self.utils.locations.LABELS[i]
             image = self.pimages[i]
             cimage = image.crop((y - PatchSampler.WSIDE, x - PatchSampler.WSIDE, y + PatchSampler.WSIDE, x + PatchSampler.WSIDE))
             cimage.save(filename%(self.subject, self.index, label, y, x))
+            samples.append(np.array(cimage))
+
+        self.generate_multi_channel_image(samples, x,y)
 
         image = self.pimages[-1]  #  the histology image
         cimage = image.crop((y - PatchSampler.WSIDE, x - PatchSampler.WSIDE, y + PatchSampler.WSIDE, x + PatchSampler.WSIDE))
         cimage.save(filename%(self.subject, self.index, 'HI', y,x))
 
+
+
         return L+1
+
+    def generate_multi_channel_image(self, samples, x,y):
+        filename = self.utils.locations.PATCH_TEMPLATE
+        N = len(samples)
+        first = samples[0]
+        (width, height, _) = first.shape
+        multi = np.zeros((width,height,N),'uint8')
+        for i in range(N):
+            multi[...,i] =  samples[i][...,0]
+
+        img = Image.fromarray(multi)
+        img.save(filename%(self.subject, self.index,'MU',y,x))
+
+
+
+
 
 

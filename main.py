@@ -6,13 +6,14 @@ Created on Tue Aug 30 17:30:15 2016
 """
 
 import deephisto as dh
+from deephisto.caffe import *
 
 SUBJECTS = []
 ids = [27,31,32,33,34,36,37,40,44]
 for i in ids:
     SUBJECTS.append('EPI_P0%s'%i)
 
-locations = dh.ImageLocations('/home/dcantor/deephisto')
+locations = dh.ImageLocations('/home/dcantor/projects/deephisto')
 utils = dh.ImageUtils(locations)
 
 def demo_patch_search():
@@ -57,15 +58,32 @@ def step_4_visual_inspection():
     """
     visualizer = dh.PatchVisualizer(locations)
     visualizer.set_subject('EPI_P036') #replace with the subject to analyze (EPI_P27,EPI_P31, etc...32,33,34,36,37,40,44)
-    visualizer.set_slice(3)
+    visualizer.set_slice(1)
     visualizer.init()
     visualizer.create_patch(325,362)
     #visualizer.update_patch(250,100)
 
+
 def step_5_create_patches():
     pcreator = dh.PatchCreator(utils)
-    pcreator.create_patches('EPI_P036',1)
+    pcreator.create_patches('EPI_P036',1,cleardir=True,coverage=70)
 
+
+def step_6_create_datasets():
+    ds = dh.DatasetCreator(locations, training=0.7)
+    ds.create()
+    ds.get_average_training_set()
+
+
+def step_7_create_dnn(): #dnn:deep neural network
+
+    descriptor = NetworkDescriptor()
+    descriptor.make(locations.ROOT_DIR+'caffe', locations.PATCHES_DIR)
+
+
+def show_dnn_structure(model, snapshot):
+    descriptor = NetworkDescriptor()
+    descriptor.show_structure(model, snapshot)
 
 def test():
     import matplotlib.pyplot as plt
@@ -106,9 +124,8 @@ def test():
 #step_3_unpack_annotations()
 step_4_visual_inspection()
 #step_5_create_patches()
-#test()
-
-
+#step_6_create_datasets()
+#step_7_create_dnn()
 
 #demo_patch_search()
 

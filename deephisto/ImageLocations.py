@@ -25,8 +25,15 @@ class ImageLocations:
         self.IMAGES_DIR         = None
         self.PNG_TEMPLATE       = None
         self.PNG_TEMPLATE_H     = None
-        self.PATCHES_DIR        = None
-        self.PATCH_TEMPLATE     = None
+
+        if self.ROOT_DIR[-1] != '/':
+            self.ROOT_DIR = self.ROOT_DIR + '/'
+
+        self.PATCHES_DIR = self.ROOT_DIR + 'patches'
+        self.PATCH_TEMPLATE = self.PATCHES_DIR + '/P_%s_%d_%s_%d_%d.png'  # subject-slice-type-x-y.png
+        self.TRAINING_MANIFEST = self.PATCHES_DIR + '/training.txt'
+        self.VALIDATION_MANIFEST = self.PATCHES_DIR + '/validation.txt'
+        self.TRAINING_AVERAGE = self.PATCHES_DIR + '/training_average.txt'
 
         if subject is not None:
             self.SUBJECT_DIR =  '/subjects/%s/'%subject
@@ -84,6 +91,8 @@ class ImageLocations:
         # -----------------------------------------------------------------------------
         #   Location of the patches
         # -----------------------------------------------------------------------------
-        self.PATCHES_DIR    =   self.ROOT_DIR + self.SUBJECT_DIR + '/patches'
-        self.PATCH_TEMPLATE =   self.PATCHES_DIR + '/P_%s_%d_%s_%d_%d.png'  # subject-slice-type-x-y.png
+        self.PATCHES_DIR      =  self.ROOT_DIR + 'patches'
+        self.PATCH_TEMPLATE   =  self.PATCHES_DIR + '/P_%s_%d_%s_%d_%d.png'  # subject-slice-type-x-y.png
+        self.TRAINING_MANIFEST = self.PATCHES_DIR + '/training.txt'
+        self.VALIDATION_MANIFEST = self.PATCHES_DIR + '/validation.txt'
 
