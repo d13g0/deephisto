@@ -60,14 +60,16 @@ def step_4_visual_inspection():
     visualizer.set_subject('EPI_P036') #replace with the subject to analyze (EPI_P27,EPI_P31, etc...32,33,34,36,37,40,44)
     visualizer.set_slice(1)
     visualizer.init()
-    visualizer.create_patch(325,362)
+    visualizer.create_patch(389,382)
     #visualizer.update_patch(250,100)
 
 
 def step_5_create_patches():
     pcreator = dh.PatchCreator(utils)
-    pcreator.create_patches('EPI_P036',1,cleardir=True,coverage=70)
-
+    pcreator.create_patches('EPI_P036',1,cleardir=True,coverage=90)
+    pcreator.create_patches('EPI_P036', 3,  coverage=90)
+    pcreator.create_patches('EPI_P036', 5,  coverage=90)
+    pcreator.create_patches('EPI_P036', 7, coverage=90)
 
 def step_6_create_datasets():
     ds = dh.DatasetCreator(locations, training=0.7)
@@ -127,6 +129,7 @@ step_4_visual_inspection()
 #step_6_create_datasets()
 #step_7_create_dnn()
 
+print 'MAIN DONE'
 #demo_patch_search()
 
 

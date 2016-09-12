@@ -57,7 +57,7 @@ class PatchCreator:
             count = count  + self._extract_patch(x,y)
 
         print '-----------------------------------------------------------'
-        print Console.OKBLUE + Console.BOLD + '%d'%count + Console.ENDC + ' png patches were created'
+        print Console.OKBLUE + Console.BOLD + '%d'%count + Console.ENDC + ' png images were created'
         print '-----------------------------------------------------------'
 
     def _extract_patch(self, x, y):

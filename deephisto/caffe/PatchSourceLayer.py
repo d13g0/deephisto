@@ -2,6 +2,9 @@ import caffe
 import numpy as np
 from PIL import Image
 import random
+import pdb
+from NetworkDefinitions import NetworkDefinitions
+
 
 class PatchSourceLayer(caffe.Layer):
     """
@@ -25,7 +28,7 @@ class PatchSourceLayer(caffe.Layer):
         self.seed = params.get('seed', None)
 
         #look /deephisto/patches/training_average.txt
-        self.mean = np.array([121, 82, 82],dtype=np.float32)
+        self.mean = NetworkDefinitions.TRAINING_MEAN
 
         datafile = '%s/%s.txt' % (self.data_dir, self.stage)  # stage = (training, validation)
         self.indices = open(datafile, 'r').read().splitlines()
@@ -70,10 +73,11 @@ class PatchSourceLayer(caffe.Layer):
         #print filename
         img = Image.open('%s/%s'%(self.data_dir,filename))
         img = np.array(img, dtype=np.float32)
-        img -= self.mean
-        #img = img/255  #normalization
-        img = img[:,:,::-1]
-        img = img.transpose((2,0,1))
+        img -= self.mean #subtract mean value
+        img = img[:,:,::-1]  #switch channels RGB -> BGR
+        ###i#mg = img[:,:,0:2] #removing MD info
+        ###img = img[:, :, 0:1] # only consider MRI
+        img = img.transpose((2,1,0))  #transpose to channel x height x width
         return img
 
 
@@ -85,5 +89,7 @@ class PatchSourceLayer(caffe.Layer):
         img = Image.open('%s/%s' % (self.data_dir, filename))
         label = np.array(img, dtype=np.uint8)
         label = label[:,:,0]  #take any channel (flatten png to grayscale image)
-        label = label[np.newaxis, ...]
+        #label[np.where(label>2)] =5 # this must be easier to predict
+        #label[np.where(label<=2)] = 0 # binarize output
+        label = label[np.newaxis, ...] #add the batch dimension
         return label

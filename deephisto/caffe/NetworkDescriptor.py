@@ -1,11 +1,13 @@
 """
 Allows creating a network definition programatically.
 """
-
+import os
+os.environ['GLOG_minloglevel'] = '2'
 import caffe
 from caffe import layers as L, params as P
 from caffe.coord_map import crop
 
+from NetworkDefinitions import NetworkDefinitions
 
 
 def conv_relu(bottom, nout, ks=3, stride=1, pad=1):
@@ -45,13 +47,13 @@ class NetworkDescriptor:
     def define_structure(self, stage, data_dir):
 
         n = caffe.NetSpec()
-        pydata_params = dict(stage=stage,  seed=1337)
+        pydata_params = dict(stage=stage) #,  seed=1337)
         pydata_params['data_dir'] = data_dir
 
         n.data, n.label = L.Python(module='PatchSourceLayer', layer='PatchSourceLayer', ntop=2, param_str=str(pydata_params))
 
         # the base net
-        n.conv1_1, n.relu1_1 = conv_relu(n.data, 8,pad=50)
+        n.conv1_1, n.relu1_1 = conv_relu(n.data, 8,pad=18)
         n.conv1_2, n.relu1_2 = conv_relu(n.relu1_1, 8)
         n.pool1 = max_pool(n.conv1_2)
 
@@ -65,10 +67,10 @@ class NetworkDescriptor:
         n.conv3_3, n.relu3_3 = conv_relu(n.relu3_2, 32)
         n.pool3 = max_pool(n.relu3_3)
 
-        # n.conv4_1, n.relu4_1 = conv_relu(n.pool3, 512)
-        # n.conv4_2, n.relu4_2 = conv_relu(n.relu4_1, 512)
-        # n.conv4_3, n.relu4_3 = conv_relu(n.relu4_2, 512)
-        # n.pool4 = max_pool(n.relu4_3)
+        n.conv4_1, n.relu4_1 = conv_relu(n.pool3, 64, ks=7)
+        n.conv4_2, n.relu4_2 = conv_relu(n.relu4_1, 64)
+        n.conv4_3, n.relu4_3 = conv_relu(n.relu4_2, 64)
+        n.pool4 = max_pool(n.relu4_3)
 
         # n.conv5_1, n.relu5_1 = conv_relu(n.pool4, 512)
         # n.conv5_2, n.relu5_2 = conv_relu(n.relu5_1, 512)
@@ -76,31 +78,32 @@ class NetworkDescriptor:
         # n.pool5 = max_pool(n.relu5_3)
 
         # fully conv
-        n.fc6, n.relu6 = conv_relu(n.pool3, 64, ks=7, pad=0)
+        n.fc6, n.relu6 = conv_relu(n.pool4, 128, ks=2, pad=0)
         #n.drop6 = L.Dropout(n.relu6, dropout_ratio=0.5, in_place=True)
 
-        n.fc7, n.relu7 = conv_relu(n.relu6, 64, ks=1, pad=0)
+        n.fc7, n.relu7 = conv_relu(n.relu6, 128, ks=1, pad=0)
         #n.drop7 = L.Dropout(n.relu7, dropout_ratio=0.5, in_place=True)
 
         n.score_fr = L.Convolution(n.relu7,
-                                   num_output=20,
+                                   num_output=NetworkDefinitions.NUM_LABELS,
                                    kernel_size=1,
                                    pad=0,
                                    param=[dict(lr_mult=1, decay_mult=1),dict(lr_mult=2, decay_mult=0)],
                                    weight_filler=dict(type='xavier'),
                                    bias_filler=dict(type='constant')
-                                   )
+                                   )  # must be 1 x num_classes x 1 x 1
 
         n.deconv = L.Deconvolution(n.score_fr,
                                    convolution_param=dict(
-                                       num_output=20,
-                                       kernel_size=16,
-                                       stride=8,
+                                       num_output=NetworkDefinitions.NUM_LABELS,
+                                       kernel_size=32,
+                                       stride=16,
                                        bias_term=False ,
                                        weight_filler=dict(type='xavier'),
                                        bias_filler=dict(type='constant')
                                    ),
-                                   param=[dict(lr_mult=0)],
+                                   #param=[dict(lr_mult=0)], #do not learn this filter?
+                                   param=[dict(lr_mult=1, decay_mult=1)]
                                    )
 
         n.score = crop(n.deconv, n.data)
@@ -120,6 +123,8 @@ class NetworkDescriptor:
             f.write(str(self.define_structure('validation', DATA_DIR)))
             print '%s generated'%val_file
 
+        self.show_structure(train_file)
+
         print 'DONE'
 
     #def add_kernel_params(self, file):
@@ -130,11 +135,14 @@ class NetworkDescriptor:
     #     net = caffe.Net(NETWORK_DEFINITION_FILE, TRAINED_MODEL, caffe.TEST)
     #     net_structure(net)
 
-    def show_structure(self, NETWORK_DEFINITION_FILE, SNAPSHOT):
-        net = caffe.Net(NETWORK_DEFINITION_FILE, SNAPSHOT, caffe.TEST)
+    def show_structure(self, NETWORK_DEFINITION_FILE, SNAPSHOT=None):
 
-        print '----------------------------------------------------------------'
-        print 'NETWORK STRUCTURE'
+        if SNAPSHOT is not None:
+            net = caffe.Net(NETWORK_DEFINITION_FILE, caffe.TEST, weights=SNAPSHOT)
+        else:
+            net = caffe.Net(NETWORK_DEFINITION_FILE, caffe.TRAIN)
+
+        print '\n\nNETWORK STRUCTURE'
         print '----------------------------------------------------------------'
         print
         print 'Layers'
@@ -145,7 +153,7 @@ class NetworkDescriptor:
         print 'Parameter Shapes (weights) (biases)'
         print
         for layer_name, param in net.params.iteritems():
-            hasdata = np.any(param[0].data > 0)
+
             try:
                 print layer_name.ljust(20) + '\t' + str(param[0].data.shape).ljust(15), str(param[1].data.shape)
             except IndexError:

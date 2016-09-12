@@ -111,7 +111,7 @@ class DatasetCreator:
                 avg_r = im[:,:,0].mean()
                 avg_g = im[:,:,1].mean()
                 avg_b = im[:,:,2].mean()
-                mean_im = np.array([avg_r, avg_b, avg_b])
+                mean_im = np.array([avg_r, avg_b, avg_b], dtype=np.int)
                 mean_all += mean_im
 
             mean_all = np.array(mean_all)

@@ -13,3 +13,4 @@ from .PatchCreator import PatchCreator
 from .PatchSampler import PatchSampler
 from .DatasetCreator import DatasetCreator
 
+__all__=['caffe']

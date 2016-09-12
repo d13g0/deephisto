@@ -1,30 +1,43 @@
 
+
+import os
+os.environ['GLOG_minloglevel'] = '1'
+
 import glob, pdb
 import numpy as np
-
+from itertools import product
 
 import os.path
 import matplotlib.pyplot as plt
 import caffe
 
 from PIL import Image
+from NetworkDefinitions import NetworkDefinitions
+
 
 # Make sure that caffe is on the python path:
 deephisto_root = '/home/dcantor/projects/deephisto/code'
 import sys,pdb
 sys.path.insert(0, deephisto_root + '/caffe')
 
-MODEL_FILE = '/home/dcantor/projects/deephisto/caffe/train.prototxt'
-PRETRAINED = '/home/dcantor/projects/deephisto/caffe/s1/_iter_16.caffemodel'
+MODEL_FILE = '/home/dcantor/projects/deephisto/caffe/deploy.prototxt'
+SNAPSHOT = '/home/dcantor/projects/deephisto/caffe/%s/_iter_%d.caffemodel'
 PATCHES_DIR = '/home/dcantor/projects/deephisto/patches'
 IMAGE_FILE = None
 LABEL_FILE = None
 net = None
+EPOCH = None
 
-def load():
-    global net
-    caffe.set_mode_cpu()
-    net = caffe.Net(MODEL_FILE, PRETRAINED, caffe.TEST)
+def load(directory, snapshot):
+    global net, EPOCH
+    #caffe.set_mode_cpu()
+    caffe.set_mode_gpu()
+    EPOCH = int(snapshot)
+    weights = SNAPSHOT%(directory,EPOCH)
+
+
+    net = caffe.Net(MODEL_FILE, caffe.TEST, weights=weights)
+    print 'snapshot ' + weights + ' loaded.'
 
 def show():
     print '----------------------------------------------------------------'
@@ -48,13 +61,25 @@ def show():
     print
     print
 
-def set_files():
+def set_files(patch=None):
     global IMAGE_FILE, LABEL_FILE
     sources = glob.glob(PATCHES_DIR + '/' + 'P_*_MU_*.png')
-    N = len(sources)
-    idx = np.random.randint(0, N - 1)
 
-    IMAGE_FILE = sources[idx]
+    if patch is None:
+        N = len(sources)
+        idx = np.random.randint(0, N - 1)
+
+        IMAGE_FILE = sources[idx]
+    else:
+        if not patch.endswith('.png'):
+            patch = patch + '.png'
+        list = [f for f in sources if os.path.basename(f) == patch]
+        if len(list) == 0:
+            raise Exception('Image %s does not exist'%patch)
+        else:
+            IMAGE_FILE = list[0]
+            idx = None
+
     LABEL_FILE = IMAGE_FILE.replace('MU','HI')
 
     print
@@ -66,49 +91,80 @@ def set_files():
     print
 
 
-def send_image():
+def send_image(patch=None):
 
-    set_files()
+    set_files(patch)
     input_image = np.array(Image.open(IMAGE_FILE))
-    print 'input image shape ' , input_image.shape
-    mean = np.array([121, 82, 82], dtype=np.float32)
     img = np.array(input_image, dtype=np.float32)
-    img -= mean
-    img = img[:,:,::-1]
-    img = img.transpose((2,0,1))
-
+    img -= NetworkDefinitions.TRAINING_MEAN   #subtract mean
+    img = img[:,:,::-1]  #RGB -> BGR
+    img = img.transpose((2,1,0)) #transpose to channel x height x width
     net.blobs['data'].data[...] = img
-    print net.blobs['data'].data.shape
-    out = net.forward()
 
-def get():
-    send_image()
+    net.forward()
 
-    input_image = np.array(Image.open(IMAGE_FILE))
-    fig,ax = plt.subplots()
-    fig.canvas.set_window_title('Input Image :'+os.path.basename(IMAGE_FILE))
-    plt.imshow(input_image, interpolation='none')
+    prediction = net.blobs['score'].data
+    prediction = prediction[0,...] #remove the batch dimension
+    prediction = prediction.argmax(axis=0)
+    return prediction
 
-    im = np.array(Image.open(LABEL_FILE))
-    im = im[:, :, 0]
-    fig, ax2 = plt.subplots()
-    fig.canvas.set_window_title('Label Image :' + os.path.basename(LABEL_FILE))
-    img2 = plt.imshow(im, interpolation='None', cmap='jet', vmin=0, vmax=20)
-    ax2.format_coord = get_formatter(im)
-    fig.colorbar(img2)
+def sampler():
+    import matplotlib.pylab as plt
+    from matplotlib import gridspec
 
-    s= net.blobs['score'].data
-    s = s[0,...] #remove the batch dimension
-    s = s.transpose(2,1,0) #change to height x width x channel   (not sure about the order here for height and width)
-    s = s.sum(axis=2)  #collapse image summing over all labels
-    fig,ax = plt.subplots()
-    fig.canvas.set_window_title('Output Image ')
-    img = ax.imshow(s, interpolation='none')
-    fig.colorbar(img)
-    ax.format_coord = get_formatter(s)
+    GSIZE = 3
+    fig, ax = plt.subplots(GSIZE*2,GSIZE*2, figsize=(12,12))
 
 
+    fig.canvas.set_window_title('DeepHisto Sampler [epoch: %d]'%EPOCH)
+    #fig.suptitle('DeepHisto Sampler', fontsize=18, color='white')
 
+    for i,j in product(range(0,GSIZE*2),range(0,GSIZE)):
+        pred = send_image()
+        label = np.array(Image.open(LABEL_FILE))
+        label = label[:, :, 0]
+        if (i==0):
+            ax[0, 2 * j].set_title('GT')
+            ax[0, 2 * j + 1].set_title('PR')
+
+        ax[i, 2 * j ].imshow(label,interpolation='None', cmap='jet', vmin=0, vmax=NetworkDefinitions.NUM_LABELS)
+        ax[i, 2 * j + 1].imshow(pred,interpolation='None', cmap='jet', vmin=0, vmax=NetworkDefinitions.NUM_LABELS)
+        ax[i, 2 * j].get_xaxis().set_visible(False)
+        ax[i, 2 * j].get_yaxis().set_visible(False)
+        ax[i, 2 * j +1].get_xaxis().set_visible(False)
+        ax[i, 2 * j +1].get_yaxis().set_visible(False)
+
+    plt.tight_layout()
+    plt.show()
+
+
+
+
+def get(patch=None):
+
+    prediction = send_image(patch)
+
+    image = np.array(Image.open(IMAGE_FILE))
+    label = np.array(Image.open(LABEL_FILE))
+    label = label[:, :, 0]
+
+    fig,ax = plt.subplots(1,3, figsize=(12,5))
+
+    fig.canvas.set_window_title(os.path.basename(IMAGE_FILE))
+
+    ax[0].set_title('Input')
+    ax[0].imshow(image, interpolation='none')
+
+    ax[1].set_title('Label')
+    img2 = ax[1].imshow(label, interpolation='None', cmap='jet', vmin=0, vmax=NetworkDefinitions.NUM_LABELS)
+    ax[1].format_coord = get_formatter(label)
+
+
+    ax[2].set_title('Output Image')
+    img3 = ax[2].imshow(prediction, interpolation='none', vmin=0, vmax=NetworkDefinitions.NUM_LABELS)
+    ax[2].format_coord = get_formatter(prediction)
+
+    plt.tight_layout()
     plt.show()
 
 
