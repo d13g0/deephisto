@@ -5,28 +5,22 @@ Created on Thu Aug 25 15:35:15 2016
 @author: dcantor
 """
 
-
-import numpy as np
-from scipy.misc import bytescale
 import matplotlib as mpl
-mpl.use('TkAgg')
+import numpy as np
+
+mpl.use('TkAgg', warn=False)
 import matplotlib.pylab as plt
 import matplotlib.patches as ppa
 from matplotlib.widgets import Button
 from matplotlib import gridspec
-import pdb
-import itertools
 import Image
 import Tkinter as Tk
-from .ImageLocations import ImageLocations
 from .ImageUtils import ImageUtils
 from .DraggableRectangle import DraggableRectangle
-from .PatchSampler import PatchSampler
-
+from .Sampler import Sampler
 
 
 class SliceButtonCallback(object):
-    
     def __init__(self, visualizer):
         self.visualizer = visualizer
 
@@ -38,41 +32,37 @@ class SliceButtonCallback(object):
         if not self.visualizer.previous_slice():
             print 'FIRST SLICE REACHED'
 
-class ImageSetHelper:
 
+class ImageSetHelper:
     def load(self, utils, indices):
-        
+
         self.mask_set = []
         self.image_set = []
         self.histo_set = []  # contains the real intensities
-        self.pimage_set = [] #used for cropping with PIL
-        
+        self.pimage_set = []  # used for cropping with PIL
+
         print 'Loading Image Set'
         for i in indices:
-            print 'Slice [%d]'%i
-            mask   = utils.load_mask_png(i)
+            print 'Slice [%d]' % i
+            mask = utils.load_mask_png(i)
             images = utils.load_source_png_images(i)
-            histo  = utils.load_histo_png_image(i)
+            histo = utils.load_histo_png_image(i)
             pimages = []
-            
+
             self.mask_set.append(mask)
             self.image_set.append(images)
             self.histo_set.append(histo)
-            
+
             for j in images:
                 pimages.append(Image.fromarray(j))
             pimages.append(Image.fromarray(histo))
-            
+
             self.pimage_set.append(pimages)
-            
-         
-        
-        
+
         print 'Image Set Loaded'
 
 
 class GoToDialog(object):
-
     def __init__(self, visualizer):
 
         self.visualizer = visualizer
@@ -123,11 +113,9 @@ class GoToDialog(object):
         self.master.geometry('%dx%d+%d+%d' % (width, height, x, y))
 
 
-
-class PatchVisualizer:
-    
+class Visualizer:
     def __init__(self, locations):
-        
+
         print ' Patch Visualizer'
         print '---------------------------------------\n'
         self.fig = None
@@ -145,11 +133,11 @@ class PatchVisualizer:
             self.set_subject(locations.subject)
 
     def reset(self):
-        
+
         if self.fig is not None:
             plt.close(self.fig)
             self.fig = None
-            
+
         self.pimages = []
         self.drs = []
         self.axs = []
@@ -158,54 +146,52 @@ class PatchVisualizer:
         self.vmax = 255
 
     def set_subject(self, subject):
-        
+
         self.reset()
-        
+
         print 'Setting subject for PatchVisualizer'
         print '---------------------------------------'
-        
+
         self.subject = subject
-        
-        print 'Subject [%s]'%self.subject
+
+        print 'Subject [%s]' % self.subject
         self.utils.set_subject(subject)
 
+        (self.vmin, self.vmax) = self.utils.get_dynrange_histo()  # makes sure the range is uniform for all slices
+        print 'Dynamic range for histology: %d, %d' % (self.vmin, self.vmax)
 
-        (self.vmin, self.vmax) = self.utils.get_dynrange_histo() #makes sure the range is uniform for all slices
-        print 'Dynamic range for histology: %d, %d'%(self.vmin, self.vmax)
-        
         self.indices = self.utils.get_annotation_indices()
-        print 'Available slices: %s'%self.indices
-        
+        print 'Available slices: %s' % self.indices
+
         self.image_helper.load(self.utils, self.indices)
-        
-        
+
         slice_num = self.indices[0]
-        print 'Selecting first slice: [%s]'%slice_num
+        print 'Selecting first slice: [%s]' % slice_num
         self.set_slice(slice_num)
 
     def set_slice(self, i):
 
         self.slice_num = i
-        
-        print 'Setting slice [%d]'%i
+
+        print 'Setting slice [%d]' % i
         idx = self.indices.index(i)
-        self.mask   = self.image_helper.mask_set[idx]
+        self.mask = self.image_helper.mask_set[idx]
         self.images = self.image_helper.image_set[idx]
-        self.histo  = self.image_helper.histo_set[idx]
-        self.histo_flat = self.histo[:,:,0]   # to show with color maps
-        self.pimages = self.image_helper.pimage_set[idx] 
+        self.histo = self.image_helper.histo_set[idx]
+        self.histo_flat = self.histo[:, :, 0]  # to show with color maps
+        self.pimages = self.image_helper.pimage_set[idx]
         self.num_sources = len(self.pimages)
 
     def next_slice(self):
         indices = self.indices
         idx = indices.index(self.slice_num)
-        if (idx < len(indices)-1):
+        if (idx < len(indices) - 1):
             self.set_slice(indices[idx + 1])
             self.update()
             return True
         else:
             return False
-    
+
     def previous_slice(self):
         indices = self.indices
         idx = indices.index(self.slice_num)
@@ -218,7 +204,7 @@ class PatchVisualizer:
 
     def get_annotation_indices(self):
         return self.utils.get_annotation_indices()
-    
+
     def init(self):
         """
         Initializes the main visualization
@@ -226,75 +212,78 @@ class PatchVisualizer:
 
         images = self.images
         mask = self.mask
-        
-        L = self.num_sources - 1  #  all sources but histo image (which is the last in the images list
-        
-        #plt.ion()
+
+        L = self.num_sources - 1  # all sources but histo image (which is the last in the images list
+
+        # plt.ion()
         self.fig = plt.figure(facecolor='black')
-        self.fig.canvas.set_window_title('DeepHisto subject: %s slice:%s patch: (%d, %d)'%(self.subject, self.slice_num, 0,0))
-        self.fig.suptitle('DeepHisto subject: %s slice:%s patch: (%d, %d)'%(self.subject, self.slice_num,0,0),fontsize=18, color='white')
-        
+        self.fig.canvas.set_window_title(
+            'DeepHisto subject: %s slice:%s patch: (%d, %d)' % (self.subject, self.slice_num, 0, 0))
+        self.fig.suptitle('DeepHisto subject: %s slice:%s patch: (%d, %d)' % (self.subject, self.slice_num, 0, 0),
+                          fontsize=18, color='white')
+
         mpl.rcParams['keymap.save'] = ''
 
         def keyevent_handler(event):
-           if event.key == 's':
-               print 'Saving figure /home/dcantor/Desktop/%s_%s.png'%(self.subject, self.slice_num)
-               event.canvas.figure.savefig('/home/dcantor/Desktop/%s_%s.png'%(self.subject, self.slice_num), 
-                    facecolor=self.fig.get_facecolor(), edgecolor='none')
+            if event.key == 's':
+                print 'Saving figure /home/dcantor/Desktop/%s_%s.png' % (self.subject, self.slice_num)
+                event.canvas.figure.savefig('/home/dcantor/Desktop/%s_%s.png' % (self.subject, self.slice_num),
+                                            facecolor=self.fig.get_facecolor(), edgecolor='none')
 
-           if event.key == 'g':
+            if event.key == 'g':
                 self._go_dialog.show()
 
         self.fig.canvas.mpl_connect('key_press_event', keyevent_handler)
 
-        gs = gridspec.GridSpec(L*2,8)
-       
+        gs = gridspec.GridSpec(L * 2, 8)
+
         first_ax = None
-        
+
         for i in range(L):
-            A = i*2
-            B = A+2
+            A = i * 2
+            B = A + 2
             if (i == 0):
-                ax = self.fig.add_subplot(gs[A:B,0:2])
+                ax = self.fig.add_subplot(gs[A:B, 0:2])
                 first_ax = ax
             else:
-                ax = self.fig.add_subplot(gs[A:B,0:2], sharex=first_ax, sharey=first_ax)
-                
+                ax = self.fig.add_subplot(gs[A:B, 0:2], sharex=first_ax, sharey=first_ax)
+
             ax.set_axis_bgcolor('black')
             ax.imshow(images[i], interpolation='none')
             ax.imshow(mask, alpha=0.3)
             ax.get_xaxis().set_visible(False)
             ax.set_ylabel(self.utils.locations.LABELS[i], fontsize=16, color='#cccccc', rotation=0)
             ax.get_yaxis().set_ticks([])
-        
-            bx = self.fig.add_subplot(gs[A:B,2:4])
+
+            bx = self.fig.add_subplot(gs[A:B, 2:4])
             bx.get_xaxis().set_visible(False)
             bx.get_yaxis().set_visible(False)
-            
+
             self.axs.append(ax)
             self.bxs.append(bx)
-        
-        #  Now processing histo image
 
-        ax = self.fig.add_subplot(gs[0:2,4:6], sharex=first_ax, sharey=first_ax)
+        # Now processing histo image
+
+        ax = self.fig.add_subplot(gs[0:2, 4:6], sharex=first_ax, sharey=first_ax)
         ax.set_axis_bgcolor('black')
-        self._histo_flat_im = ax.imshow(self.histo_flat,interpolation='none', vmin=self.vmin, vmax=self.vmax, cmap='jet')
+        self._histo_flat_im = ax.imshow(self.histo_flat, interpolation='none', vmin=self.vmin, vmax=self.vmax,
+                                        cmap='jet')
 
         ax.imshow(mask, alpha=0.3)
         ax.get_yaxis().set_visible(False)
         ax.set_xlabel('Histology', fontsize=16, color='#cccccc')
         ax.get_xaxis().set_ticks([])
-        
-        bx = self.fig.add_subplot(gs[0:2,6:8])
+
+        bx = self.fig.add_subplot(gs[0:2, 6:8])
         bx.get_xaxis().set_visible(False)
         bx.get_yaxis().set_visible(False)
-        
+
         self.axs.append(ax)
         self.bxs.append(bx)
-        
+
         callback = SliceButtonCallback(self)
-        
-        bprev_ax = plt.axes([0.7, 0.05, 0.1, 0.075]) 
+
+        bprev_ax = plt.axes([0.7, 0.05, 0.1, 0.075])
         self.bprev = Button(bprev_ax, 'Previous')
         self.bprev.on_clicked(callback.prev)
 
@@ -302,14 +291,13 @@ class PatchVisualizer:
         self.bnext = Button(bnext_ax, 'Next')
         self.bnext.on_clicked(callback.next)
 
-
         mng = plt.get_current_fig_manager()
         if mng.window is not None and isinstance(mng.window, Tk.Tk):
             mng.window.attributes('-zoomed', True)
 
         self.fig.show()
 
-    def _zoom_source(self, x,y):
+    def _zoom_source(self, x, y):
         """
         Zooms in the source images
         :param x:
@@ -320,11 +308,11 @@ class PatchVisualizer:
 
         for i in range(L):
             pimage = self.pimages[i]
-            cimage = pimage.crop((x - PatchSampler.WSIDE, y - PatchSampler.WSIDE, x + PatchSampler.WSIDE, y + PatchSampler.WSIDE))
+            cimage = pimage.crop(
+                    (x - Sampler.WSIDE, y - Sampler.WSIDE, x + Sampler.WSIDE, y + Sampler.WSIDE))
             self.bxs[i].imshow(cimage, interpolation='none')
 
-
-    def _zoom_histo(self,x,y):
+    def _zoom_histo(self, x, y):
         """
         Zooms in the histology
         :param x:
@@ -333,16 +321,16 @@ class PatchVisualizer:
         """
 
         im = Image.fromarray(self.histo).crop(
-            (x - PatchSampler.WSIDE, y - PatchSampler.WSIDE, x + PatchSampler.WSIDE, y + PatchSampler.WSIDE))
+                (x - Sampler.WSIDE, y - Sampler.WSIDE, x + Sampler.WSIDE, y + Sampler.WSIDE))
         im = np.array(im)[:, :, 0]
         self._imhisto = self.bxs[-1].imshow(im, interpolation='none', vmin=self.vmin, vmax=self.vmax, cmap='jet')
-        #print 'Zoom histo (min, max) = (%d, %d)'%(im.min(), im.max())
+        # print 'Zoom histo (min, max) = (%d, %d)'%(im.min(), im.max())
         self._update_pixel_picker(im)
-
 
     def _update_pixel_picker(self, zoomed_histo):
 
         numcols, numrows = zoomed_histo.shape
+
         def format_coord(x, y):
             row = int(x + 0.5)
             col = int(y + 0.5)
@@ -363,7 +351,8 @@ class PatchVisualizer:
         y = self._patch_y
         for i, ax in enumerate(self.axs):
             self._ax = self.axs[i]
-            rect = ppa.Rectangle((x - PatchSampler.WSIDE, y - PatchSampler.WSIDE), PatchSampler.WSIZE, PatchSampler.WSIZE, linewidth=1, edgecolor='r', facecolor='none')
+            rect = ppa.Rectangle((x - Sampler.WSIDE, y - Sampler.WSIDE), Sampler.WSIZE,
+                                 Sampler.WSIZE, linewidth=1, edgecolor='r', facecolor='none')
             self._ax.add_patch(rect)
             dr = DraggableRectangle(rect, self.update_patch)
             dr.connect()
@@ -375,33 +364,36 @@ class PatchVisualizer:
         :return:
         """
         if (self.fig is not None):
-            self.fig.canvas.set_window_title('DeepHisto subject: %s slice:%s patch: (%d, %d)' % (self.subject, self.slice_num, self._patch_x, self._patch_y))
-            self.fig.suptitle('DeepHisto subject: %s slice:%s patch: (%d, %d)' % (self.subject, self.slice_num, self._patch_x, self._patch_y), fontsize=18, color='white')
+            self.fig.canvas.set_window_title('DeepHisto subject: %s slice:%s patch: (%d, %d)' % (
+            self.subject, self.slice_num, self._patch_x, self._patch_y))
+            self.fig.suptitle('DeepHisto subject: %s slice:%s patch: (%d, %d)' % (
+            self.subject, self.slice_num, self._patch_x, self._patch_y), fontsize=18, color='white')
 
-    def create_patch(self, x,y):
+    def create_patch(self, x, y):
         '''
         Creates interactive patches (draggable)
         This method is invoked by the user (ideally once)
         '''
-        self._patch_x = x  #coordinates of the patch centre
+        self._patch_x = x  # coordinates of the patch centre
         self._patch_y = y
         self._create_draggable_rectangles()
         self._update_title()
-        self._zoom_source(x,y)
-        self._zoom_histo(x,y)
+        self._zoom_source(x, y)
+        self._zoom_histo(x, y)
 
-        im = Image.fromarray(self.histo).crop((x - PatchSampler.WSIDE, y - PatchSampler.WSIDE, x + PatchSampler.WSIDE, y + PatchSampler.WSIDE))
+        im = Image.fromarray(self.histo).crop(
+                (x - Sampler.WSIDE, y - Sampler.WSIDE, x + Sampler.WSIDE, y + Sampler.WSIDE))
         im = np.array(im)[:, :, 0]
         numrows, numcols = im.shape
-        #print 'current dyn range (min, max) = (%d, %d)' % (im.min(), im.max())
+        # print 'current dyn range (min, max) = (%d, %d)' % (im.min(), im.max())
 
         self._update_pixel_picker(im)
-        #clbar = plt.colorbar(self._histo_flat_im , ax=self.bxs[-1], ticks=range(self.vmin, self.vmax + 1, 2))
-        #plt.setp(plt.getp(clbar.ax.axes, 'yticklabels'), color='w')
+        # clbar = plt.colorbar(self._histo_flat_im , ax=self.bxs[-1], ticks=range(self.vmin, self.vmax + 1, 2))
+        # plt.setp(plt.getp(clbar.ax.axes, 'yticklabels'), color='w')
 
         plt.show()
-    
-    def update_patch(self, x,y):
+
+    def update_patch(self, x, y):
         """
         Updates the position of the current patch
         :param x:
@@ -411,12 +403,12 @@ class PatchVisualizer:
         self._patch_x = x
         self._patch_y = y
         self._update_title()
-        self._zoom_source(x,y)
-        self._zoom_histo(x,y)
+        self._zoom_source(x, y)
+        self._zoom_histo(x, y)
         for i, ax in enumerate(self.axs):
             self._ax = ax
-            self.drs[i].rect.set_x(x-PatchSampler.WSIDE)
-            self.drs[i].rect.set_y(y-PatchSampler.WSIDE)
+            self.drs[i].rect.set_x(x - Sampler.WSIDE)
+            self.drs[i].rect.set_y(y - Sampler.WSIDE)
 
         self.fig.canvas.draw()
 
@@ -430,22 +422,19 @@ class PatchVisualizer:
         self._update_title()
         images = self.images
         mask = self.mask
-        histo = self.histo
         for i, ax in enumerate(self.axs[:-1]):
-            ax.imshow(images[i],interpolation='none')
+            ax.imshow(images[i], interpolation='none')
             ax.imshow(mask, alpha=0.3)
-        self.axs[-1].imshow(self.histo_flat, interpolation='none',vmin=self.vmin, vmax=self.vmax)
+        self.axs[-1].imshow(self.histo_flat, interpolation='none', vmin=self.vmin, vmax=self.vmax)
         self.axs[-1].imshow(mask, alpha=0.3)
         self.update_patch(self._patch_x, self._patch_y)
 
-
-        #print 'range histo current slice (min, max) = (%d, %d)'%(self.histo_flat.min(), self.histo_flat.max())
-
-    def show_rectangle(self, x,y):
+    def show_rectangle(self, x, y):
         '''
         Draws and initializes a draggable rectangle
         '''
-        rect = ppa.Rectangle((y-PatchSampler.WSIDE,x-PatchSampler.WSIDE),PatchSampler.WSIZE,PatchSampler.WSIZE, linewidth=1, edgecolor='r', facecolor='r', alpha=0.2)
+        rect = ppa.Rectangle((y - Sampler.WSIDE, x - Sampler.WSIDE), Sampler.WSIZE, Sampler.WSIZE,
+                             linewidth=1, edgecolor='r', facecolor='r', alpha=0.2)
         self._ax.add_patch(rect)
         plt.pause(0.001)
 
@@ -455,7 +444,8 @@ class PatchVisualizer:
         """
         print '\n\nDEMO START'
         print '----------------------'
-        plt.ion()
+        # plt.ion()
+
         bmask = self.utils.get_binary_mask(self.slice_num)
         fig, ax = plt.subplots(1, facecolor='black')
         fig.canvas.set_window_title('Demo patch search')
@@ -464,16 +454,16 @@ class PatchVisualizer:
         ax.imshow(self.mask, alpha=0.5)
         plt.draw()
 
-        self.ps = PatchSampler(bmask)
-        self.ps.sample(PatchSampler.S_MONTECARLO, params=None, callback=self.show_rectangle)
+        self.ps = Sampler(bmask)
+        # self.ps.sample(PatchSampler.S_MONTECARLO, params=None, callback=self.show_rectangle)
+        self.ps.sample(Sampler.S_OVERLAP, params=None, callback=self.show_rectangle)
+
+        plt.show()
 
         print '----------------------'
         print 'DEMO END'
 
-    def search(self):
-        self.init_patch_search()
-        #plt.ion()
-        find_patches(self.nmask, self.show_patch)
-        #plt.ioff()
-
-
+        # def search(self):
+        #     self.init_patch_search()
+        #     find_patches(self.nmask, self.show_patch)
+        #

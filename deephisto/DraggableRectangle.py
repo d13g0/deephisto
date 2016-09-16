@@ -5,7 +5,7 @@ Created on Mon Aug 22 22:40:25 2016
 @author: dcantor
 """
 
-from .PatchSampler import PatchSampler
+from .Sampler import Sampler
 
 class DraggableRectangle:
     def __init__(self, rect, callback):
@@ -13,8 +13,8 @@ class DraggableRectangle:
         self.press = None
         self.callback = callback
         self.centre_x, self.centre_y = self.rect.get_xy()
-        self.centre_x  += PatchSampler.WSIDE
-        self.centre_y  += PatchSampler.WSIDE
+        self.centre_x  += Sampler.WSIDE
+        self.centre_y  += Sampler.WSIDE
 
     def connect(self):
         'connect to all the events we need'
@@ -29,8 +29,8 @@ class DraggableRectangle:
         contains, attrd = self.rect.contains(event)
         if not contains: return
         x0, y0 = self.rect.xy
-        self.centre_x = x0 + PatchSampler.WSIDE
-        self.centre_y = y0 + PatchSampler.WSIDE
+        self.centre_x = x0 + Sampler.WSIDE
+        self.centre_y = y0 + Sampler.WSIDE
         self.press = x0, y0, event.xdata, event.ydata
 
     def on_motion(self, event):
@@ -46,8 +46,8 @@ class DraggableRectangle:
         self.rect.set_x(x0+dx)
         self.rect.set_y(y0+dy)
 
-        self.centre_x = x0+dx + PatchSampler.WSIDE
-        self.centre_y = y0+dy + PatchSampler.WSIDE
+        self.centre_x = x0+dx + Sampler.WSIDE
+        self.centre_y = y0+dy + Sampler.WSIDE
         self.callback(int(self.centre_x), int(self.centre_y)) #callback must be the center coords
 
         #self.rect.figure.canvas.draw()

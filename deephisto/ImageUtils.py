@@ -8,19 +8,17 @@ import numpy as np
 from scipy import misc
 from scipy.misc import bytescale
 import os, zipfile,errno
-
-
 import nibabel as nib
 import Image
 from PIL import ImageFilter
-from .ImageLocations import ImageLocations
+from .Locations import Locations
 from .Console import Console
-from .PatchSampler import PatchSampler
+from .Sampler import Sampler
 
 class ImageUtils:
  
     def __init__(self, locations):
-        if locations == None or not isinstance(locations, ImageLocations):
+        if locations == None or not isinstance(locations, Locations):
             raise 'You must provide a valid ImageLocations object to initialize the ImageUtils object'
     
         self.locations = locations
@@ -36,7 +34,7 @@ class ImageUtils:
         return data
 
     @staticmethod
-    def image_to_unscaled_rgb(data):  #  used for creating UNSCALED PNG images (for example histological maps)
+    def data_to_unscaled_rgb(data):  #  used to create the GROUND TRUTH PNGs (Histology)
         w, h = data.shape
         ret = np.empty((w, h, 3), dtype=np.uint8)
         ret[:, :, 0] = data
@@ -45,7 +43,7 @@ class ImageUtils:
         return ret
 
     @staticmethod
-    def image_to_rgb(data):
+    def image_to_bytescale_rgb(data): # used to create the SOURCE PNGs (MRI, FA, MD)
         """
         Converts a single-channel grayscale image to a 3-channel image that can be 
         then saved as a  PNG        
@@ -59,14 +57,20 @@ class ImageUtils:
         return ret
 
 
-    @staticmethod    
-    def image_to_gray(data):
-        """
-        Converts a PNG image to a single-channel grayscale image
-        """
-        r, g, b = data[:,:,0], data[:,:,1],data[:,:,2]
-        gray = 0.2989 * r + 0.5870 *g + 0.1140*b
-        return gray
+    # @staticmethod
+    # def rgb_to_single(data, channel):
+    #     w,h = data.shape[0:2]
+    #     ret = np.empty((w,h))
+    #     ret[:,:] = data[:,:,channel]
+    #     return ret
+
+    # def image_to_gray(data):
+    #     """
+    #     Converts a PNG image to a single-channel grayscale image
+    #     """
+    #     r, g, b = data[:,:,0], data[:,:,1],data[:,:,2]
+    #     gray = 0.2989 * r + 0.5870 *g + 0.1140*b
+    #     return gray
     
     def set_subject(self, subject):
         self.subject = subject
@@ -87,11 +91,10 @@ class ImageUtils:
         
         index:  index of the mask to retrieve
         """
-    
+        import pdb
         mask = self.load_mask_png(index)
-        mask = mask[:,:,0] #for practical reasons pick one channel
-        (x,y) = np.where(mask>0) #pixels in mask
-        new_mask = np.zeros(shape=mask.shape, dtype=np.uint8)
+        (x,y) = np.where(mask>0)[0:2] #pixels in mask disregarding the color
+        new_mask = np.zeros(shape=mask.shape[0:2], dtype=np.uint8)
         new_mask[(x,y)] = 255
         return new_mask
 
@@ -149,7 +152,7 @@ class ImageUtils:
         print 'Creating the Histology Feature Map PNGs'
         for i in range(num_slices):
             #imslice = ImageUtils.image_to_rgb(fmap_img[:,:,i])
-            imslice = ImageUtils.image_to_unscaled_rgb(fmap_img[:,:,i]);  #keeps the original values
+            imslice = ImageUtils.data_to_unscaled_rgb(fmap_img[:, :, i]);  #keeps the original values
             
             if not os.path.exists(os.path.dirname(self.locations.PNG_TEMPLATE_H%i)):
                 os.makedirs(os.path.dirname(self.locations.PNG_TEMPLATE_H%i))
@@ -195,7 +198,22 @@ class ImageUtils:
             data.append(slice_data)
             
         return data #images in the same order as labels
-        
+
+    def load_multichannel_input(self, num_slice):
+        """
+        Creates a multi-channel array with all the inputs:
+         R->MRI
+         G->FA
+         B->MD
+         for now..
+        """
+        data = np.array(self.load_source_png_images(num_slice))
+        items, w, h, channels = data.shape
+        multi = np.empty((w,h,channels))
+        assert items == channels, 'The number of images must be equal to the number of channels'
+        for i in range(0,items):
+            multi[:,:,i] = data[i,:,:,0]
+        return multi
     
     def load_histo_png_image(self, num_slice):
         """

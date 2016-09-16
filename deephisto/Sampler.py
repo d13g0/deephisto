@@ -3,12 +3,13 @@ import random
 
 from .Console import Console
 
-class PatchSampler:
+class Sampler:
 
     WSIZE = 30
     WSIDE = WSIZE / 2
     S_MONTECARLO = 'Montecarlo'
     S_SYSTEMATIC = 'Systematic'
+    S_OVERLAP = 'Overlap'
 
 
     def __init__(self, bmask):
@@ -16,23 +17,24 @@ class PatchSampler:
         self.set_mask(bmask)
 
         self.samplers = {
-            PatchSampler.S_MONTECARLO: self.montecarlo_sampling,
-            PatchSampler.S_SYSTEMATIC: self.systematic_sampling
+            Sampler.S_MONTECARLO: self.montecarlo_sampling,
+            Sampler.S_SYSTEMATIC: self.systematic_sampling,
+            Sampler.S_OVERLAP   : self.regular_overlap_sampling,
         }
 
 
     def set_mask(self,bmask):
         self.bmask = bmask
-        (a, b) = np.where(self.bmask == 255)  # list of coordinates
+        (a, b) = np.where(self.bmask > 0)  # list of coordinates
         self.coords = zip(a, b)
         self.L = len(self.coords)
 
     def check_convex(self, x,y):
 
-        x1 = x - PatchSampler.WSIDE
-        x2 = x + PatchSampler.WSIDE
-        y1 = y - PatchSampler.WSIDE
-        y2 = y + PatchSampler.WSIDE
+        x1 = x - Sampler.WSIDE
+        x2 = x + Sampler.WSIDE
+        y1 = y - Sampler.WSIDE
+        y2 = y + Sampler.WSIDE
 
         coords = self.coords
         return (x1, y1) in coords and (x2, y2) in coords
@@ -40,10 +42,10 @@ class PatchSampler:
 
     def check_fully_convex(self, x,y):
 
-        x1 = x - PatchSampler.WSIDE
-        x2 = x + PatchSampler.WSIDE
-        y1 = y - PatchSampler.WSIDE
-        y2 = y + PatchSampler.WSIDE
+        x1 = x - Sampler.WSIDE
+        x2 = x + Sampler.WSIDE
+        y1 = y - Sampler.WSIDE
+        y2 = y + Sampler.WSIDE
 
         coords = self.coords
 
@@ -119,3 +121,35 @@ class PatchSampler:
 
         return selected
 
+    def regular_overlap_sampling(self, params, callback):
+
+        selected = []
+
+        fx, fy = self.coords[0]
+        selected.append((fx, fy))
+
+        MAX_X, MAX_Y = self.bmask.shape
+
+        STEP = Sampler.WSIZE / 5
+
+        print 'One moment please ....'
+
+        while(fx <= MAX_X and fy <=MAX_Y):
+            while (fy < MAX_Y):
+                fy = fy + STEP
+                if (fx,fy) in self.coords:
+                    selected.append((fx,fy))
+                    # if callback is not None: callback(fx, fy)
+            fx = fx+ STEP
+            fy = 0
+
+
+
+        print 'Number of selections: ' + Console.OKBLUE + '%d' % len(selected) + Console.ENDC
+
+        for s in selected:
+            (x,y) = s
+            if callback is not None: callback(x,y)
+
+
+        return selected

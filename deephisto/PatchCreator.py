@@ -1,7 +1,7 @@
 import numpy as np
 import Image
 import os, shutil
-from .PatchSampler import PatchSampler
+from .Sampler import Sampler
 from .Console import  Console
 
 
@@ -13,8 +13,7 @@ class PatchCreator:
         self.index = None
         self.pimages = []
 
-
-    def create_patches(self, subject, index, cleardir=False,coverage=30):
+    def create_patches(self, subject, index, cleardir=False): #,coverage=30):
         """
         :param subject:    The subject
         :param index:       The current slice
@@ -32,7 +31,7 @@ class PatchCreator:
         else:
             #  Empty directory first
             if (cleardir):
-                print Console.WARNING + utils.locations.PATCHES_DIR + ' exists. Emptying the directory before creating new patches' + Console.ENDC
+                print Console.WARNING + utils.locations.PATCHES_DIR + ' exists. Emptying the patches directory [%s] before creating new patches'%utils.locations.PATCHES_DIR + Console.ENDC
                 shutil.rmtree(utils.locations.PATCHES_DIR)
                 os.makedirs(utils.locations.PATCHES_DIR)
 
@@ -47,9 +46,12 @@ class PatchCreator:
 
         histo = self.utils.load_histo_png_image(index)
         self.pimages.append(Image.fromarray(histo))
+        print
+        print 'Sampling subject %s, slice %d'%(self.subject, self.index)
 
-        sampler = PatchSampler(bmask)
-        selected = sampler.sample(PatchSampler.S_MONTECARLO,params={'C':coverage})
+        sampler = Sampler(bmask)
+        selected = sampler.sample(Sampler.S_OVERLAP, params=None)
+        #selected = sampler.sample(PatchSampler.S_MONTECARLO,params={'C':coverage})
 
 
         count = 0
@@ -62,6 +64,8 @@ class PatchCreator:
 
     def _extract_patch(self, x, y):
 
+
+
         filename = self.utils.locations.PATCH_TEMPLATE
 
         L = len(self.pimages)-1
@@ -71,14 +75,22 @@ class PatchCreator:
         for i in range(L):
             label = self.utils.locations.LABELS[i]
             image = self.pimages[i]
-            cimage = image.crop((y - PatchSampler.WSIDE, x - PatchSampler.WSIDE, y + PatchSampler.WSIDE, x + PatchSampler.WSIDE))
-            cimage.save(filename%(self.subject, self.index, label, y, x))
+            # @TODO
+            # It troubles me that for this piece of code to work the cordinates x, and y are inverted
+            # yet in other parts like in SliceTest.py this does not happen. Somewhere along the code this inversion occurs
+            # it might have to do with matplotlib and PIL? I don't know.
+            cimage = image.crop((y - Sampler.WSIDE, x - Sampler.WSIDE, y + Sampler.WSIDE, x + Sampler.WSIDE))
+            #cimage.save(filename%(self.subject, self.index, label, y, x))  not saving intermediate images
             samples.append(np.array(cimage))
 
         self.generate_multi_channel_image(samples, x,y)
 
         image = self.pimages[-1]  #  the histology image
-        cimage = image.crop((y - PatchSampler.WSIDE, x - PatchSampler.WSIDE, y + PatchSampler.WSIDE, x + PatchSampler.WSIDE))
+        # @TODO
+        # It troubles me that for this piece of code to work the cordinates x, and y are inverted
+        # yet in other parts like in SliceTest.py this does not happen. Somewhere along the code this inversion occurs
+        # it might have to do with matplotlib and PIL? I don't know.
+        cimage = image.crop((y - Sampler.WSIDE, x - Sampler.WSIDE, y + Sampler.WSIDE, x + Sampler.WSIDE))
         cimage.save(filename%(self.subject, self.index, 'HI', y,x))
 
 
@@ -86,7 +98,7 @@ class PatchCreator:
         return L+1
 
     def generate_multi_channel_image(self, samples, x,y):
-        filename = self.utils.locations.PATCH_TEMPLATE
+
         N = len(samples)
         first = samples[0]
         (width, height, _) = first.shape
@@ -95,6 +107,8 @@ class PatchCreator:
             multi[...,i] =  samples[i][...,0]
 
         img = Image.fromarray(multi)
+
+        filename = self.utils.locations.PATCH_TEMPLATE
         img.save(filename%(self.subject, self.index,'MU',y,x))
 
 
