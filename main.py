@@ -5,22 +5,24 @@ Created on Tue Aug 30 17:30:15 2016
 @author: dcantor
 """
 
-import deephisto as dh
+from deephisto import ImageUtils, Locations, DatasetCreator, PatchCreator
 from deephisto.caffe import *
+
+from visualizer import Visualizer
+from sampling_demo import PatchSamplingDemo
 
 SUBJECTS = []
 ids = [27,31,32,33,34,36,37,40,44]
 for i in ids:
     SUBJECTS.append('EPI_P0%s'%i)
 
-locations = dh.Locations('/home/dcantor/projects/deephisto')
-utils = dh.ImageUtils(locations)
+locations = Locations('/home/dcantor/projects/deephisto')
+utils = ImageUtils(locations)
 
 def demo_patch_search():
-    visualizer = dh.Visualizer(locations)
-    visualizer.set_subject('EPI_P036')
-    visualizer.set_slice(3)
-    visualizer.demo_patch_search()
+    demo = PatchSamplingDemo(locations)
+    demo.configure('EPI_P036',3)
+    demo.run()
 
 
 def step_1_download_nifti_files():
@@ -56,7 +58,7 @@ def step_4_visual_inspection(subject, slice, x, y):
     histology and the exvivo images is accurate and that the annotations (histology mask) fits these images
     appropriately
     """
-    visualizer = dh.Visualizer(locations)
+    visualizer = Visualizer(locations)
     visualizer.set_subject(subject) #replace with the subject to analyze (EPI_P27,EPI_P31, etc...32,33,34,36,37,40,44)
     visualizer.set_slice(slice)
     visualizer.init()
@@ -65,7 +67,7 @@ def step_4_visual_inspection(subject, slice, x, y):
 
 
 def step_5_create_patches():
-    pcreator = dh.PatchCreator(utils)
+    pcreator = PatchCreator(utils)
     pcreator.create_patches('EPI_P036',1,cleardir=True)
     pcreator.create_patches('EPI_P036', 3)
     pcreator.create_patches('EPI_P036', 5)
@@ -77,7 +79,7 @@ def step_5_create_patches():
 
 
 def step_6_create_datasets():
-    ds = dh.DatasetCreator(locations, training=0.8)
+    ds = DatasetCreator(locations, training=0.8)
     ds.create()
     ds.get_average_training_set()
 
@@ -96,7 +98,7 @@ def test():
     import matplotlib.pyplot as plt
     import Image
     import numpy as np
-    PatchSampler = dh.Sampler
+    PatchSampler = dh.PatchSampler
     utils.set_subject('EPI_P036')
     histo = utils.load_histo_png_image(3)
     x = 325
@@ -129,9 +131,9 @@ def test():
 #step_1_download_nifti_files()
 #step_2_create_all_pngs()
 #step_3_unpack_annotations()
-#step_4_visual_inspection('EPI_P036',1,246,106)
-#step_5_create_patches()
-step_6_create_datasets()
+#step_4_visual_inspection('EPI_P036',1,282,334)
+step_5_create_patches()
+#step_6_create_datasets()
 #step_7_create_dnn()
 
 

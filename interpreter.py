@@ -1,12 +1,12 @@
 import cmd
 import matplotlib.pylab as plt
 import multiprocessing as mlt
-from NetTest import NetTest
+from deephisto.caffe import NetInteractor
 
 class Interpreter(cmd.Cmd):
     def __init__(self):
         cmd.Cmd.__init__(self)
-        self.obs = NetTest()
+        self.obs = NetInteractor()
 
     prompt = '>> '
     ruler = '-'

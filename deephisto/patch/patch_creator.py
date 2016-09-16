@@ -1,8 +1,11 @@
-import numpy as np
+import os
+import shutil
+
 import Image
-import os, shutil
-from .Sampler import Sampler
-from .Console import  Console
+import numpy as np
+
+from deephisto.patch import PatchSampler
+from deephisto.utils import  Console
 
 
 class PatchCreator:
@@ -49,21 +52,23 @@ class PatchCreator:
         print
         print 'Sampling subject %s, slice %d'%(self.subject, self.index)
 
-        sampler = Sampler(bmask)
-        selected = sampler.sample(Sampler.S_OVERLAP, params=None)
+        sampler = PatchSampler(bmask)
+        selected = sampler.sample(PatchSampler.S_OVERLAP, params=None)
         #selected = sampler.sample(PatchSampler.S_MONTECARLO,params={'C':coverage})
 
 
         count = 0
-        for (x,y) in selected:
-            count = count  + self._extract_patch(x,y)
+        for (y,x) in selected:   #first dimension is row (y), second is column (x). results of the sampler in image convention (numpy)
+            count = count  + self._extract_patch(x,y) # continue processing in cartesian convention
 
         print '-----------------------------------------------------------'
         print Console.OKBLUE + Console.BOLD + '%d'%count + Console.ENDC + ' png images were created'
         print '-----------------------------------------------------------'
 
     def _extract_patch(self, x, y):
-
+        """
+        x,y: cartesian coordinates of the center of the patch that needs to be extracted
+        """
 
 
         filename = self.utils.locations.PATCH_TEMPLATE
@@ -75,23 +80,17 @@ class PatchCreator:
         for i in range(L):
             label = self.utils.locations.LABELS[i]
             image = self.pimages[i]
-            # @TODO
-            # It troubles me that for this piece of code to work the cordinates x, and y are inverted
-            # yet in other parts like in SliceTest.py this does not happen. Somewhere along the code this inversion occurs
-            # it might have to do with matplotlib and PIL? I don't know.
-            cimage = image.crop((y - Sampler.WSIDE, x - Sampler.WSIDE, y + Sampler.WSIDE, x + Sampler.WSIDE))
-            #cimage.save(filename%(self.subject, self.index, label, y, x))  not saving intermediate images
+
+            cimage = image.crop((x - PatchSampler.WSIDE, y - PatchSampler.WSIDE, x + PatchSampler.WSIDE, y + PatchSampler.WSIDE))
+            #cimage.save(filename%(self.subject, self.index, label, x, y))  not saving intermediate images
             samples.append(np.array(cimage))
 
         self.generate_multi_channel_image(samples, x,y)
 
         image = self.pimages[-1]  #  the histology image
-        # @TODO
-        # It troubles me that for this piece of code to work the cordinates x, and y are inverted
-        # yet in other parts like in SliceTest.py this does not happen. Somewhere along the code this inversion occurs
-        # it might have to do with matplotlib and PIL? I don't know.
-        cimage = image.crop((y - Sampler.WSIDE, x - Sampler.WSIDE, y + Sampler.WSIDE, x + Sampler.WSIDE))
-        cimage.save(filename%(self.subject, self.index, 'HI', y,x))
+
+        cimage = image.crop((x - PatchSampler.WSIDE, y - PatchSampler.WSIDE, x + PatchSampler.WSIDE, y + PatchSampler.WSIDE))
+        cimage.save(filename%(self.subject, self.index, 'HI', x,y))
 
 
 
@@ -109,7 +108,7 @@ class PatchCreator:
         img = Image.fromarray(multi)
 
         filename = self.utils.locations.PATCH_TEMPLATE
-        img.save(filename%(self.subject, self.index,'MU',y,x))
+        img.save(filename%(self.subject, self.index,'MU',x,y))
 
 
 

@@ -5,10 +5,12 @@ Created on Thu Aug 11 14:04:22 2016
 @author: dcantor
 """
 
-from shutil import copyfile
 import errno
 import os
-from .Console import Console
+from shutil import copyfile
+
+from deephisto.utils.console import Console
+
 
 class ImageRetriever:
     """

@@ -4,13 +4,9 @@ Created on Tue Aug 30 17:27:31 2016
 
 @author: dcantor
 """
-from .Console import Console
-from .Locations import Locations
-from .ImageUtils import ImageUtils
-from .ImageRetriever import ImageRetriever
-from .Visualizer import Visualizer
-from .PatchCreator import PatchCreator
-from .Sampler import Sampler
-from .DatasetCreator import DatasetCreator
-
-__all__=['caffe']
+from locations import Locations
+from utils.console import Console
+from patch import PatchSampler, PatchCreator
+from image import ImageRetriever, ImageUtils
+from dataset import DatasetCreator
+__all__=['utils','image','patch','dataset','caffe']

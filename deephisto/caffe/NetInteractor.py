@@ -15,7 +15,7 @@ from CaffeLocations import CaffeLocations
 # Making sure that this file is visible to caffe
 sys.path.insert(0, CaffeLocations.CAFFE_CODE_DIR)
 
-class NetTest:
+class NetInteractor:
     def __init__(self):
 
         caffe.set_mode_gpu()

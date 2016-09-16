@@ -1,11 +1,12 @@
-
-import glob, csv,pdb
+import csv
+import glob
 import os.path
+
 import numpy as np
 from PIL import Image
 from sklearn.cross_validation import  ShuffleSplit
-from .Locations import Locations
-from .Console import  Console
+
+from deephisto.utils.console import Console
 
 
 class DatasetCreator:

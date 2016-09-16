@@ -4,16 +4,21 @@ Created on Thu Aug 25 15:31:42 2016
 
 @author: dcantor
 """
+import errno
+import os
+import zipfile
+
+import Image
+import nibabel as nib
 import numpy as np
+from PIL import ImageFilter
 from scipy import misc
 from scipy.misc import bytescale
-import os, zipfile,errno
-import nibabel as nib
-import Image
-from PIL import ImageFilter
-from .Locations import Locations
-from .Console import Console
-from .Sampler import Sampler
+
+from deephisto import Locations, Console
+
+
+
 
 class ImageUtils:
  
@@ -43,7 +48,7 @@ class ImageUtils:
         return ret
 
     @staticmethod
-    def image_to_bytescale_rgb(data): # used to create the SOURCE PNGs (MRI, FA, MD)
+    def data_to_bytescale_rgb(data): # used to create the SOURCE PNGs (MRI, FA, MD)
         """
         Converts a single-channel grayscale image to a 3-channel image that can be 
         then saved as a  PNG        
@@ -91,11 +96,10 @@ class ImageUtils:
         
         index:  index of the mask to retrieve
         """
-        import pdb
         mask = self.load_mask_png(index)
-        (x,y) = np.where(mask>0)[0:2] #pixels in mask disregarding the color
+        (rows,cols) = np.where(mask>0)[0:2] #pixels in mask disregarding the color
         new_mask = np.zeros(shape=mask.shape[0:2], dtype=np.uint8)
-        new_mask[(x,y)] = 255
+        new_mask[(rows,cols)] = 255
         return new_mask
 
 
@@ -168,7 +172,7 @@ class ImageUtils:
                 #mind  = vol[:,:,i].min()
                 #maxd  = vol[:,:,i].max()
 
-                imslice = ImageUtils.image_to_rgb(vol[:,:,i])
+                imslice = ImageUtils.image_to_rgb(vol[:, :, i])
                 #mina = imslice[:, :, 0].min()
                 #maxa = imslice[:, :, 0].max()
 

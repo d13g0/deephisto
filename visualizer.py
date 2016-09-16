@@ -15,9 +15,12 @@ from matplotlib.widgets import Button
 from matplotlib import gridspec
 import Image
 import Tkinter as Tk
-from .ImageUtils import ImageUtils
-from .DraggableRectangle import DraggableRectangle
-from .Sampler import Sampler
+
+from deephisto.locations import Locations
+from deephisto.image import ImageUtils
+from deephisto.patch import PatchSampler
+from deephisto.utils import DraggableRectangle
+
 
 
 class SliceButtonCallback(object):
@@ -89,6 +92,7 @@ class GoToDialog(object):
         Tk.mainloop()
 
     def goto_coords(self):
+        # Using cartesian coordinates
         x = int(self.e1.get())
         y = int(self.e2.get())
         self.visualizer.update_patch(x, y)
@@ -114,6 +118,18 @@ class GoToDialog(object):
 
 
 class Visualizer:
+    """
+    Visualizes the DeepHisto database. Coordinates appear in cartesian convention,
+    with the origin in the upper left corner:
+
+              cols
+        ----------------> x (w)
+        |
+  rows  |
+        |
+        v y (h)
+    """
+
     def __init__(self, locations):
 
         print ' Patch Visualizer'
@@ -218,7 +234,7 @@ class Visualizer:
         # plt.ion()
         self.fig = plt.figure(facecolor='black')
         self.fig.canvas.set_window_title(
-            'DeepHisto subject: %s slice:%s patch: (%d, %d)' % (self.subject, self.slice_num, 0, 0))
+                'DeepHisto subject: %s slice:%s patch: (%d, %d)' % (self.subject, self.slice_num, 0, 0))
         self.fig.suptitle('DeepHisto subject: %s slice:%s patch: (%d, %d)' % (self.subject, self.slice_num, 0, 0),
                           fontsize=18, color='white')
 
@@ -300,31 +316,26 @@ class Visualizer:
     def _zoom_source(self, x, y):
         """
         Zooms in the source images
-        :param x:
-        :param y:
-        :return:
+        x,y: cartesian coordinates of the center of the patch
         """
         L = self.num_sources - 1  # all sources but histo image (which is the last in the images list
 
         for i in range(L):
             pimage = self.pimages[i]
             cimage = pimage.crop(
-                    (x - Sampler.WSIDE, y - Sampler.WSIDE, x + Sampler.WSIDE, y + Sampler.WSIDE))
+                    (x - PatchSampler.WSIDE, y - PatchSampler.WSIDE, x + PatchSampler.WSIDE, y + PatchSampler.WSIDE))
             self.bxs[i].imshow(cimage, interpolation='none')
 
     def _zoom_histo(self, x, y):
         """
         Zooms in the histology
-        :param x:
-        :param y:
-        :return:
+        x,y: cartesian coordinates of the center of the patch
         """
 
         im = Image.fromarray(self.histo).crop(
-                (x - Sampler.WSIDE, y - Sampler.WSIDE, x + Sampler.WSIDE, y + Sampler.WSIDE))
+                (x - PatchSampler.WSIDE, y - PatchSampler.WSIDE, x + PatchSampler.WSIDE, y + PatchSampler.WSIDE))
         im = np.array(im)[:, :, 0]
         self._imhisto = self.bxs[-1].imshow(im, interpolation='none', vmin=self.vmin, vmax=self.vmax, cmap='jet')
-        # print 'Zoom histo (min, max) = (%d, %d)'%(im.min(), im.max())
         self._update_pixel_picker(im)
 
     def _update_pixel_picker(self, zoomed_histo):
@@ -351,8 +362,8 @@ class Visualizer:
         y = self._patch_y
         for i, ax in enumerate(self.axs):
             self._ax = self.axs[i]
-            rect = ppa.Rectangle((x - Sampler.WSIDE, y - Sampler.WSIDE), Sampler.WSIZE,
-                                 Sampler.WSIZE, linewidth=1, edgecolor='r', facecolor='none')
+            rect = ppa.Rectangle((x - PatchSampler.WSIDE, y - PatchSampler.WSIDE), PatchSampler.WSIZE,
+                                 PatchSampler.WSIZE, linewidth=1, edgecolor='r', facecolor='none')
             self._ax.add_patch(rect)
             dr = DraggableRectangle(rect, self.update_patch)
             dr.connect()
@@ -365,14 +376,15 @@ class Visualizer:
         """
         if (self.fig is not None):
             self.fig.canvas.set_window_title('DeepHisto subject: %s slice:%s patch: (%d, %d)' % (
-            self.subject, self.slice_num, self._patch_x, self._patch_y))
+                self.subject, self.slice_num, self._patch_x, self._patch_y))
             self.fig.suptitle('DeepHisto subject: %s slice:%s patch: (%d, %d)' % (
-            self.subject, self.slice_num, self._patch_x, self._patch_y), fontsize=18, color='white')
+                self.subject, self.slice_num, self._patch_x, self._patch_y), fontsize=18, color='white')
 
     def create_patch(self, x, y):
         '''
         Creates interactive patches (draggable)
         This method is invoked by the user (ideally once)
+        x,y: cartesian coordinates of the center of the wanted patch
         '''
         self._patch_x = x  # coordinates of the patch centre
         self._patch_y = y
@@ -382,12 +394,12 @@ class Visualizer:
         self._zoom_histo(x, y)
 
         im = Image.fromarray(self.histo).crop(
-                (x - Sampler.WSIDE, y - Sampler.WSIDE, x + Sampler.WSIDE, y + Sampler.WSIDE))
+                (x - PatchSampler.WSIDE, y - PatchSampler.WSIDE, x + PatchSampler.WSIDE, y + PatchSampler.WSIDE))
         im = np.array(im)[:, :, 0]
         numrows, numcols = im.shape
-        # print 'current dyn range (min, max) = (%d, %d)' % (im.min(), im.max())
 
         self._update_pixel_picker(im)
+        #@TODO: show a color bar
         # clbar = plt.colorbar(self._histo_flat_im , ax=self.bxs[-1], ticks=range(self.vmin, self.vmax + 1, 2))
         # plt.setp(plt.getp(clbar.ax.axes, 'yticklabels'), color='w')
 
@@ -396,9 +408,7 @@ class Visualizer:
     def update_patch(self, x, y):
         """
         Updates the position of the current patch
-        :param x:
-        :param y:
-        :return:
+        x,y: cartesian coordinates of the center of the patch
         """
         self._patch_x = x
         self._patch_y = y
@@ -407,9 +417,8 @@ class Visualizer:
         self._zoom_histo(x, y)
         for i, ax in enumerate(self.axs):
             self._ax = ax
-            self.drs[i].rect.set_x(x - Sampler.WSIDE)
-            self.drs[i].rect.set_y(y - Sampler.WSIDE)
-
+            self.drs[i].rect.set_x(x - PatchSampler.WSIDE)
+            self.drs[i].rect.set_y(y - PatchSampler.WSIDE)
         self.fig.canvas.draw()
 
     def update(self):
@@ -428,42 +437,3 @@ class Visualizer:
         self.axs[-1].imshow(self.histo_flat, interpolation='none', vmin=self.vmin, vmax=self.vmax)
         self.axs[-1].imshow(mask, alpha=0.3)
         self.update_patch(self._patch_x, self._patch_y)
-
-    def show_rectangle(self, x, y):
-        '''
-        Draws and initializes a draggable rectangle
-        '''
-        rect = ppa.Rectangle((y - Sampler.WSIDE, x - Sampler.WSIDE), Sampler.WSIZE, Sampler.WSIZE,
-                             linewidth=1, edgecolor='r', facecolor='r', alpha=0.2)
-        self._ax.add_patch(rect)
-        plt.pause(0.001)
-
-    def demo_patch_search(self):
-        """
-        Shows how the convex search is achieved
-        """
-        print '\n\nDEMO START'
-        print '----------------------'
-        # plt.ion()
-
-        bmask = self.utils.get_binary_mask(self.slice_num)
-        fig, ax = plt.subplots(1, facecolor='black')
-        fig.canvas.set_window_title('Demo patch search')
-        ax.set_axis_bgcolor('black')
-        self._ax = ax
-        ax.imshow(self.mask, alpha=0.5)
-        plt.draw()
-
-        self.ps = Sampler(bmask)
-        # self.ps.sample(PatchSampler.S_MONTECARLO, params=None, callback=self.show_rectangle)
-        self.ps.sample(Sampler.S_OVERLAP, params=None, callback=self.show_rectangle)
-
-        plt.show()
-
-        print '----------------------'
-        print 'DEMO END'
-
-        # def search(self):
-        #     self.init_patch_search()
-        #     find_patches(self.nmask, self.show_patch)
-        #

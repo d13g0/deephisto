@@ -5,7 +5,7 @@ Created on Mon Aug 22 22:40:25 2016
 @author: dcantor
 """
 
-from .Sampler import Sampler
+from deephisto.patch.patch_sampler import PatchSampler as Sampler
 
 class DraggableRectangle:
     def __init__(self, rect, callback):
