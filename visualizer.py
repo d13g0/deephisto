@@ -49,7 +49,8 @@ class ImageSetHelper:
             print 'Slice [%d]' % i
             mask = utils.load_mask_png(i)
             images = utils.load_source_png_images(i)
-            histo = utils.load_histo_png_image(i)
+            histo = utils.load_unscaled_histo_png_image(i)
+
             pimages = []
 
             self.mask_set.append(mask)
@@ -130,7 +131,7 @@ class Visualizer:
         v y (h)
     """
 
-    def __init__(self, locations):
+    def __init__(self, locations, wsize=30):
 
         print ' Patch Visualizer'
         print '---------------------------------------\n'
@@ -147,6 +148,13 @@ class Visualizer:
         self._picker = None
         if locations.subject is not None:
             self.set_subject(locations.subject)
+
+        self.WSIZE = wsize
+        if self.WSIZE %2 !=0:
+            raise ValueError('The parameter wsize (window size) must be even')
+
+        self.WSIDE = self.WSIZE / 2
+        print ' Window size: %d'%self.WSIZE
 
     def reset(self):
 
@@ -195,6 +203,10 @@ class Visualizer:
         self.images = self.image_helper.image_set[idx]
         self.histo = self.image_helper.histo_set[idx]
         self.histo_flat = self.histo[:, :, 0]  # to show with color maps
+
+        # self.histo_flat[(self.histo_flat <1)] = 0
+        # self.histo_flat[(self.histo_flat >=1)] = 5 #surgery
+
         self.pimages = self.image_helper.pimage_set[idx]
         self.num_sources = len(self.pimages)
 
@@ -323,7 +335,7 @@ class Visualizer:
         for i in range(L):
             pimage = self.pimages[i]
             cimage = pimage.crop(
-                    (x - PatchSampler.WSIDE, y - PatchSampler.WSIDE, x + PatchSampler.WSIDE, y + PatchSampler.WSIDE))
+                    (x - self.WSIDE, y - self.WSIDE, x + self.WSIDE, y + self.WSIDE))
             self.bxs[i].imshow(cimage, interpolation='none')
 
     def _zoom_histo(self, x, y):
@@ -333,7 +345,7 @@ class Visualizer:
         """
 
         im = Image.fromarray(self.histo).crop(
-                (x - PatchSampler.WSIDE, y - PatchSampler.WSIDE, x + PatchSampler.WSIDE, y + PatchSampler.WSIDE))
+                (x - self.WSIDE, y - self.WSIDE, x + self.WSIDE, y + self.WSIDE))
         im = np.array(im)[:, :, 0]
         self._imhisto = self.bxs[-1].imshow(im, interpolation='none', vmin=self.vmin, vmax=self.vmax, cmap='jet')
         self._update_pixel_picker(im)
@@ -362,10 +374,10 @@ class Visualizer:
         y = self._patch_y
         for i, ax in enumerate(self.axs):
             self._ax = self.axs[i]
-            rect = ppa.Rectangle((x - PatchSampler.WSIDE, y - PatchSampler.WSIDE), PatchSampler.WSIZE,
-                                 PatchSampler.WSIZE, linewidth=1, edgecolor='r', facecolor='none')
+            rect = ppa.Rectangle((x - self.WSIDE, y - self.WSIDE), self.WSIZE,
+                                 self.WSIZE, linewidth=1, edgecolor='r', facecolor='none')
             self._ax.add_patch(rect)
-            dr = DraggableRectangle(rect, self.update_patch)
+            dr = DraggableRectangle(rect, self.WSIDE, self.update_patch)
             dr.connect()
             self.drs.append(dr)
 
@@ -394,7 +406,7 @@ class Visualizer:
         self._zoom_histo(x, y)
 
         im = Image.fromarray(self.histo).crop(
-                (x - PatchSampler.WSIDE, y - PatchSampler.WSIDE, x + PatchSampler.WSIDE, y + PatchSampler.WSIDE))
+                (x - self.WSIDE, y - self.WSIDE, x + self.WSIDE, y + self.WSIDE))
         im = np.array(im)[:, :, 0]
         numrows, numcols = im.shape
 

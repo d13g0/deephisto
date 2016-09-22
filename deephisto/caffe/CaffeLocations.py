@@ -1,10 +1,12 @@
+import numpy as np
+
 class CaffeLocations:
     """
     This file contains variables and paths specific to caffe processing.
     """
     NUM_LABELS = 10
 
-    # TRAINING_MEAN = np.array([136, 99, 99], dtype=np.float32)
+    TRAINING_MEAN = np.array([126, 94, 94], dtype=np.float32)
 
     DH_ROOT = '/home/dcantor/projects/deephisto'
 
@@ -16,15 +18,16 @@ class CaffeLocations:
     SNAPSHOT_DIR = DATA_DIR + '/%s/_iter_%d.caffemodel'
 
     SPLIT_DIR = CAFFE_WORKDIR + '/split'
-    AVG_IMG = SPLIT_DIR + '/training_avg.png'
+    AVG_IMG =  'training_avg.png'
 
     NET_DIR = CAFFE_WORKDIR + '/net'
-    DEPLOY_NET_PROTOTXT = NET_DIR + '/deploy.prototxt'
 
-    TRAINING_PROTO = 'train.prototxt'
+    TRAINING_PROTO   = 'train.prototxt'
     VALIDATION_PROTO = 'val.prototxt'
+    DEPLOY_PROTO     = 'deploy.prototxt'
 
     STAGE_TRAIN = 'training'
     STAGE_VALIDATION = 'validation'
+    STAGE_DEPLOY     = 'deploy'
 
     CAFFE_CODE_DIR = CODE_DIR + '/caffe'

@@ -10,11 +10,13 @@ from deephisto.utils import  Console
 
 class PatchCreator:
 
-    def __init__(self, utils):
+    def __init__(self, utils, sampler,target_dir):
         self.utils = utils
         self.subject = None
         self.index = None
         self.pimages = []
+        self.sampler = sampler
+        self.target_dir = target_dir
 
     def create_patches(self, subject, index, cleardir=False): #,coverage=30):
         """
@@ -28,34 +30,35 @@ class PatchCreator:
         self.utils.set_subject(subject)
 
         utils = self.utils
-        if not os.path.exists(utils.locations.PATCHES_DIR):
-            os.makedirs(utils.locations.PATCHES_DIR)
-            print 'Creating directory %s'%utils.locations.PATCHES_DIR
+
+        data_dir = utils.locations.PATCHES_DIR + '/' + self.target_dir
+        if not os.path.exists(data_dir):
+            os.makedirs(data_dir)
+            print 'Creating directory %s'%data_dir
         else:
             #  Empty directory first
             if (cleardir):
-                print Console.WARNING + utils.locations.PATCHES_DIR + ' exists. Emptying the patches directory [%s] before creating new patches'%utils.locations.PATCHES_DIR + Console.ENDC
-                shutil.rmtree(utils.locations.PATCHES_DIR)
-                os.makedirs(utils.locations.PATCHES_DIR)
+                print Console.WARNING + data_dir + ' exists. Emptying the patches directory [%s] before creating new patches'%self.target_dir + Console.ENDC
+                shutil.rmtree(data_dir)
+                os.makedirs(data_dir)
 
 
 
         bmask = self.utils.get_binary_mask(index)
+        self.sampler.set_mask(bmask)
+
         self.pimages = []
 
         images = self.utils.load_source_png_images(index)
         for j in images:
             self.pimages.append(Image.fromarray(j))
 
-        histo = self.utils.load_histo_png_image(index)
+        histo = self.utils.load_unscaled_histo_png_image(index)
         self.pimages.append(Image.fromarray(histo))
         print
         print 'Sampling subject %s, slice %d'%(self.subject, self.index)
 
-        sampler = PatchSampler(bmask)
-        selected = sampler.sample(PatchSampler.S_OVERLAP, params=None)
-        #selected = sampler.sample(PatchSampler.S_MONTECARLO,params={'C':coverage})
-
+        selected = self.sampler.sample()
 
         count = 0
         for (y,x) in selected:   #first dimension is row (y), second is column (x). results of the sampler in image convention (numpy)
@@ -76,27 +79,31 @@ class PatchCreator:
         L = len(self.pimages)-1
 
         samples = []
+        WSIDE = self.sampler.WSIDE
+        WSIZE = self.sampler.WSIZE
 
         for i in range(L):
             label = self.utils.locations.LABELS[i]
             image = self.pimages[i]
 
-            cimage = image.crop((x - PatchSampler.WSIDE, y - PatchSampler.WSIDE, x + PatchSampler.WSIDE, y + PatchSampler.WSIDE))
+
+
+            cimage = image.crop((x - WSIDE, y -WSIDE, x + WSIDE, y + WSIDE))
             #cimage.save(filename%(self.subject, self.index, label, x, y))  not saving intermediate images
             samples.append(np.array(cimage))
 
-        self.generate_multi_channel_image(samples, x,y)
+        self.save_multi_channel_image(samples, x, y)
 
         image = self.pimages[-1]  #  the histology image
 
-        cimage = image.crop((x - PatchSampler.WSIDE, y - PatchSampler.WSIDE, x + PatchSampler.WSIDE, y + PatchSampler.WSIDE))
-        cimage.save(filename%(self.subject, self.index, 'HI', x,y))
+        cimage = image.crop((x - WSIDE, y - WSIDE, x + WSIDE, y + WSIDE))
+        cimage.save(filename%(self.target_dir, self.subject, self.index, 'HI', x,y))
 
 
 
-        return L+1
+        return 2 #only count the MU and the HI PATCHES
 
-    def generate_multi_channel_image(self, samples, x,y):
+    def save_multi_channel_image(self, samples, x, y):
 
         N = len(samples)
         first = samples[0]
@@ -108,7 +115,7 @@ class PatchCreator:
         img = Image.fromarray(multi)
 
         filename = self.utils.locations.PATCH_TEMPLATE
-        img.save(filename%(self.subject, self.index,'MU',x,y))
+        img.save(filename%(self.target_dir, self.subject, self.index,'MU',x,y))
 
 
 

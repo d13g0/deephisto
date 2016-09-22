@@ -5,7 +5,7 @@ Created on Thu Aug 25 15:31:42 2016
 @author: dcantor
 """
 import errno
-import os
+import os,shutil
 import zipfile
 
 import Image
@@ -119,7 +119,7 @@ class ImageUtils:
         max = -1
         min = 10000000
         for idx in indices:
-            data = self.load_histo_png_image(idx)
+            data = self.load_unscaled_histo_png_image(idx)
             print data.min(), data.max()
             if data.min() < min:
                 min = data.min()
@@ -133,6 +133,7 @@ class ImageUtils:
 
 
 
+
     def create_png_images(self):
         """
         Loads the feature map (histology image) and creates the PNGs for all the
@@ -141,8 +142,15 @@ class ImageUtils:
         if self.subject is None:
             print Console.WARNING + 'You need to specify a subject first' + Console.ENDC
             return
-        fmap_img = ImageUtils.load_nifti_image(self.locations.HIST_FMAP)
 
+        check_dir = self.locations.check_dir
+        check_dir(self.locations.HISTO_PNG_U)
+        check_dir(self.locations.HISTO_PNG)
+        check_dir(self.locations.SOURCE_PNG)
+
+
+
+        fmap_img = ImageUtils.load_nifti_image(self.locations.HIST_FMAP) #loading subject nifti files
         volumes = []
         try:
             for s in self.locations.SOURCES:
@@ -151,38 +159,31 @@ class ImageUtils:
             print Console.FAIL + 'There are errors loading nifi files for subject %s'%self.subject + Console.ENDC
             return False
         
-        num_slices = volumes[0].shape[2] #use first volume to check dimensions
-        
-        print 'Creating the Histology Feature Map PNGs'
-        for i in range(num_slices):
-            #imslice = ImageUtils.image_to_rgb(fmap_img[:,:,i])
-            imslice = ImageUtils.data_to_unscaled_rgb(fmap_img[:, :, i]);  #keeps the original values
-            
-            if not os.path.exists(os.path.dirname(self.locations.PNG_TEMPLATE_H%i)):
-                os.makedirs(os.path.dirname(self.locations.PNG_TEMPLATE_H%i))
-                
-            im = Image.fromarray(imslice)
-            im2 = im.filter(ImageFilter.GaussianBlur(radius=2))
-            im2.save(self.locations.PNG_TEMPLATE_H%i)
-            #print self.locations.PNG_TEMPLATE_H%(i)
 
-        print 'Creating Input Images PNGs'
+        num_slices = volumes[0].shape[2] #use first volume to check expected number of slices
+
+        print 'Creating input PNGs for %s'%self.subject
         for k, vol in enumerate(volumes):
             for i in range(num_slices):
-                #mind  = vol[:,:,i].min()
-                #maxd  = vol[:,:,i].max()
-
-                imslice = ImageUtils.image_to_rgb(vol[:, :, i])
-                #mina = imslice[:, :, 0].min()
-                #maxa = imslice[:, :, 0].max()
-
-                #print self.locations.LABELS[k], ' min %f' % mind, ' max %f' % maxd,'  min after %f'%mina, ' max after %f'%maxa
-
+                imslice = ImageUtils.data_to_bytescale_rgb(vol[:, :, i])
                 im = Image.fromarray(imslice)
-                im.save(self.locations.PNG_TEMPLATE%(i,self.locations.LABELS[k]))
-                #print self.locations.PNG_TEMPLATE%(i,self.locations.LABELS[k])
-        
+                im.save(self.locations.SOURCE_PNG % (i, self.locations.LABELS[k]))
 
+        
+        print 'Creating histology PNGs for %s'%self.subject
+        for i in range(num_slices):
+
+            im_unscaled = ImageUtils.data_to_unscaled_rgb(fmap_img[:, :, i]);  #keeps the original values
+            im_unscaled = Image.fromarray(im_unscaled)
+            im_unscaled = im_unscaled.filter(ImageFilter.GaussianBlur(radius=2))  #Filter requested by Ali Khan
+            im_unscaled.save(self.locations.HISTO_PNG_U % i)
+
+            im_scaled = ImageUtils.data_to_bytescale_rgb(fmap_img[:,:,i]); # bytescaled histology
+            im_scaled = Image.fromarray(im_scaled)
+            im_scaled = im_scaled.filter(ImageFilter.GaussianBlur(radius=2))  #Filter requested by Ali Khan
+            im_scaled.save(self.locations.HISTO_PNG % i)
+
+        print
         return True
     
  
@@ -195,7 +196,7 @@ class ImageUtils:
             return
         data = []    
         for l in self.locations.LABELS:
-            slice_file = self.locations.PNG_TEMPLATE%(num_slice, l)
+            slice_file = self.locations.SOURCE_PNG % (num_slice, l)
             
             #print 'Loading Input Image \t\t%s'%slice_file 
             slice_data = misc.imread(slice_file) 
@@ -219,7 +220,7 @@ class ImageUtils:
             multi[:,:,i] = data[i,:,:,0]
         return multi
     
-    def load_histo_png_image(self, num_slice):
+    def load_unscaled_histo_png_image(self, num_slice):
         """
         Loads the respective Histology png for the slice being analyzed
         """
@@ -227,15 +228,31 @@ class ImageUtils:
             print Console.WARNING + 'You need to specify a subject first' + Console.ENDC
             return
         data = []
-        hfile = self.locations.PNG_TEMPLATE_H%(num_slice)
-        #print 'Loading Histo Feature Map \t%s'%hfile
+        hfile = self.locations.HISTO_PNG_U % (num_slice)
         data = misc.imread(hfile)
 
         return data #png histology
 
+    def load_bytescaled_histo_png_image(self, num_slice):
+        """
+        Loads the respective Histology png for the slice being analyzed
+        """
+        if self.subject is None:
+            print Console.WARNING + 'You need to specify a subject first' + Console.ENDC
+            return
+        data = []
+        hfile = self.locations.HISTO_PNG % (num_slice)
+        data = misc.imread(hfile)
+
+        return data  # png histology
+
  
     def unpack_annotations(self):
         url = self.locations.ANNOTATIONS_ZIP
+
+        shutil.rmtree(self.locations.MASK_DIR)
+        os.makedirs(self.locations.MASK_DIR)
+
         try:
             zipf = zipfile.ZipFile(url)
             zipf.extractall(self.locations.MASK_DIR)
@@ -249,7 +266,7 @@ class ImageUtils:
        files = [fn for fn in os.listdir(self.locations.MASK_DIR) if fn.endswith('.png')]
        indices = []
        for fn in files:
-           index  = int(fn.split('_')[2])  #A_[S_5_t_HI].png = A, [S, 5, t, HI].png
+           index  = int(fn.split('_')[2])  #A_S_5_t_HI.png = A, S, 5, t, HI.png
            indices.append(index)
            indices.sort()
        return indices

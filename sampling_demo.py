@@ -18,8 +18,9 @@ class PatchSamplingDemo:
         self.bmask   = None
         self.fig     = None
         self.ax      = None
+        self.sampler = None
 
-    def configure(self,subject,index):
+    def configure(self,subject,index, sampler):
         """
         subject: one of the deephisto subjects
         index: one of the slices (needs to be anotated so the png exists)
@@ -30,12 +31,16 @@ class PatchSamplingDemo:
         self.utils.set_subject(subject)
         self.mask = self.utils.load_mask_png(index)
         self.bmask = self.utils.get_binary_mask(index)
+        self.sampler = sampler
+        self.sampler.set_mask(self.bmask)
 
     def show_rectangle(self, x, y):
         '''
         Draws and initializes a draggable rectangle
         '''
-        rect = ppa.Rectangle((y - PatchSampler.WSIDE, x - PatchSampler.WSIDE), PatchSampler.WSIZE, PatchSampler.WSIZE,
+        WSIDE = self.sampler.WSIDE
+        WSIZE = self.sampler.WSIZE
+        rect = ppa.Rectangle((y - WSIDE, x - WSIDE), WSIZE, WSIZE,
                              linewidth=1, edgecolor='r', facecolor='r', alpha=0.2)
         self.ax.add_patch(rect)
         plt.pause(0.001)
@@ -62,10 +67,8 @@ class PatchSamplingDemo:
         ax.imshow(self.mask, alpha=0.5)
         plt.draw()
 
-        ps = PatchSampler(self.bmask)
-        ps.sample(PatchSampler.S_OVERLAP, params=None, callback=self.show_rectangle)
-        # self.ps.sample(PatchSampler.S_MONTECARLO, params=None, callback=self.show_rectangle)
 
+        self.sampler.sample()
 
         plt.show()
         print '----------------------'
@@ -75,5 +78,5 @@ class PatchSamplingDemo:
 if __name__=='__main__':
     locations = Locations('/home/dcantor/projects/deephisto')
     demo = PatchSamplingDemo(locations)
-    demo.configure('EPI_P036',1)
+    demo.configure('EPI_P036',7)
     demo.run()

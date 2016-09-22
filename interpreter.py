@@ -1,12 +1,21 @@
+import os
+
+os.environ['GLOG_minloglevel'] = '2'
 import cmd
 import matplotlib.pylab as plt
 import multiprocessing as mlt
-from deephisto.caffe import NetInteractor
+
+from deephisto import Locations, Console
+from deephisto.caffe import NetInteractor, NetTest
+
 
 class Interpreter(cmd.Cmd):
-    def __init__(self):
+    def __init__(self, locations):
         cmd.Cmd.__init__(self)
+        self.locations = locations
         self.obs = NetInteractor()
+        self.net_test = NetTest(locations)
+        self.data_dir = None
 
     prompt = '>> '
     ruler = '-'
@@ -21,11 +30,13 @@ class Interpreter(cmd.Cmd):
         print "Exit the interpreter."
         print "You can also use the Ctrl-D shortcut."
 
-    def do_intro(self, line):
-        print 'Welcome to the network observer. Type intro to show this message'
+    def do_man(self, line):
+        print 'Welcome to the network observer. Type ' + Console.BOLD + 'man' + Console.ENDC + ' to show this message'
         print '------------------------------------------------------------------------------'
         print
         print ' Commands: '
+        print
+        print '   data  [dir]                 : sets the data directory '
         print
         print '   Single patch:'
         print '   ============='
@@ -47,18 +58,49 @@ class Interpreter(cmd.Cmd):
         print '   next                        : next epoch   '
         print '   play (loop)                 : plays animation'
         print
-        print '   exit: exits the network observer'
+        print
+        print '   Subject:'
+        print '   ========'
+        print '   run [subject] [slice] [window]  : runs the network on this slice patcy-by-patch'
+        print
+        print '   man                             : shows this message                          '
+        print '   exit                            : exits the interpreter'
         print '------------------------------------------------------------------------------'
+
+    def do_data(self, args):
+        """Sets the data source for the network"""
+        if (len(args.split()) != 1):
+            print 'Wrong number of paramters. data [dir] expected.'
+            return
+        self.data_dir = args.split()[0]
+
+        dir = self.locations.PATCHES_DIR + '/' + self.data_dir
+        if not os.path.exists(dir):
+            print '%s does not exist'
+            return
+        dir = self.locations.PATCHES_DIR + '/' + self.data_dir
+
+        if not os.path.exists(dir):
+            print '%s does not exist'
+            return
+
+        print ' data dir set to ' + Console.BOLD +'%s' % self.data_dir + Console.ENDC
+        return
 
     def do_load(self, args):
         """load [directory] [epoch] : loads a network with the given epoch data"""
         if (len(args.split()) != 2):
-            print 'Wrong number of paramters. [directory] [epoch] expected.'
+            print ' Wrong number of paramters. [directory] [epoch] expected.'
             return
 
         directory, epoch = args.split()
         epoch = int(epoch)
-        self.obs.load_model(directory, epoch)
+
+        if self.data_dir == None:
+            print ' you need to set the data directory first with set_data [dir]'
+            return
+        else:
+            self.obs.load_model(directory, epoch, self.data_dir)
 
     def do_ping(self, args):
         """ping [patch (optional)] if patch is present queries the network for this patch. otherwise queries a random patch"""
@@ -66,10 +108,9 @@ class Interpreter(cmd.Cmd):
             patch = None
         else:
             patch = args
-        image_file, label, pred = self.obs.get_single_prediction(patch_name=patch)
-        process = mlt.Process(target=self.obs.show_single_prediction, args=(image_file, label, pred))
-        process.start()
-        # self.obs.single_prediction(patch_name=patch)
+        image_file, label, pred, channels = self.obs.get_single_prediction(patch_name=patch)
+        plt.ion()
+        self.obs.show_single_prediction(image_file, label, pred, channels)
 
     def do_net(self, args):
         """net: shows the structure of the current network"""
@@ -84,30 +125,44 @@ class Interpreter(cmd.Cmd):
         else:
             directory, epoch = args.split()
             epoch = int(epoch)
-            self.obs.load_model(directory, epoch)
-
+            if self.data_dir == None:
+                print 'You need to set the data directory first with set_data [dir]'
+                return
+            else:
+                try:
+                    self.obs.load_model(directory, epoch, self.data_dir)
+                except Exception as e:
+                    print e.message
+                    return
         self.obs.setup_panel()
         self.do_rand(None)
-        plt.tight_layout()
 
     def do_rand(self, args):
         """rand : loads a random sample of patches, queries the network and displays the ground truth (GT) and the prediction
                 PR in the panel"""
         obs = self.obs
+        plt.ion()
         obs.get_inputs()
         obs.get_predictions()
         obs.show_labels()
         obs.show_predictions()
+        plt.tight_layout()
+        plt.draw()
 
     def do_epoch(self, args):
         """epoch [e] : loads the epoch indicated by e and updates the pannel"""
-        if len(args) != 1:
+        if len(args.split()) != 1:
             print "Please indicate the epoch you want to see [integer]"
             return
 
         epoch = int(args)
         obs = self.obs
-        obs.load_model(obs.directory, epoch)
+        try:
+            obs.load_model(obs.directory, epoch, self.data_dir)
+        except:
+            print 'Error'
+            return
+
         obs.get_predictions()
         obs.show_predictions()
 
@@ -117,16 +172,21 @@ class Interpreter(cmd.Cmd):
         :param start: initial epoch
         :param stop:  final epoch
         :param step: animation step
-        """
+            """
         if len(args.split()) != 4:
             print 'Wrong number of parameters please check'
             return
+
+        if self.data_dir == None:
+            print 'You need to set the data directory first with set_data [dir]'
+            return
+
         directory, start, stop, step = args.split()
         start = int(start)
         stop = int(stop)
         step = int(step)
         obs = self.obs
-        obs.configure(directory, start, stop, step)
+        obs.configure_sequence(directory, start, stop, step, self.data_dir)
         obs.setup_panel()
         obs.get_predictions()
         obs.show_predictions()
@@ -156,6 +216,22 @@ class Interpreter(cmd.Cmd):
             plt.pause(0.00001)
         print 'DONE'
 
+    def do_run(self, args):
+        if (len(args.split()) != 3):
+            print 'Error: run [subject] [slice] [wsize]'
+            return
+        subject, slice, wsize = args.split()
+        slice = int(slice)
+        wsize = int(wsize)
+        try:
+            self.net_test.load_data(subject, slice)
+        except ValueError as e:
+            print e
+            return
+        self.net_test.load_network(self.obs.directory, self.obs.epoch, self.data_dir)
+        self.net_test.set_window(wsize)
+        self.net_test.go()
+
     def do_pipe(self, args):
         for arg in args:
             s = arg
@@ -168,6 +244,7 @@ class Interpreter(cmd.Cmd):
 
 
 if __name__ == '__main__':
-    i = Interpreter()
-    i.do_intro(None)
+    locations = Locations('/home/dcantor/projects/deephisto')
+    i = Interpreter(locations)
+    i.do_man(None)
     i.cmdloop()
