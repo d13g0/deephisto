@@ -143,10 +143,10 @@ class ImageUtils:
             print Console.WARNING + 'You need to specify a subject first' + Console.ENDC
             return
 
-        check_dir = self.locations.check_dir
-        check_dir(self.locations.HISTO_PNG_U)
-        check_dir(self.locations.HISTO_PNG)
-        check_dir(self.locations.SOURCE_PNG)
+        check_dir_of = self.locations.check_dir_of
+        check_dir_of(self.locations.HISTO_PNG_U)
+        check_dir_of(self.locations.HISTO_PNG)
+        check_dir_of(self.locations.SOURCE_PNG)
 
 
 
@@ -162,12 +162,14 @@ class ImageUtils:
 
         num_slices = volumes[0].shape[2] #use first volume to check expected number of slices
 
+        self.locations.create_empty_dir(self.locations.IMAGES_DIR)
+
         print 'Creating input PNGs for %s'%self.subject
         for k, vol in enumerate(volumes):
             for i in range(num_slices):
                 imslice = ImageUtils.data_to_bytescale_rgb(vol[:, :, i])
                 im = Image.fromarray(imslice)
-                im.save(self.locations.SOURCE_PNG % (i, self.locations.LABELS[k]))
+                im.save(self.locations.SOURCE_PNG % (self.locations.LABELS[k],i))
 
         
         print 'Creating histology PNGs for %s'%self.subject
@@ -196,7 +198,7 @@ class ImageUtils:
             return
         data = []    
         for l in self.locations.LABELS:
-            slice_file = self.locations.SOURCE_PNG % (num_slice, l)
+            slice_file = self.locations.SOURCE_PNG % (l, num_slice)
             
             #print 'Loading Input Image \t\t%s'%slice_file 
             slice_data = misc.imread(slice_file) 
@@ -249,8 +251,12 @@ class ImageUtils:
  
     def unpack_annotations(self):
         url = self.locations.ANNOTATIONS_ZIP
+        try:
+            shutil.rmtree(self.locations.MASK_DIR)
+        except OSError as e:
+            if e.errno == errno.ENOENT:
+                pass
 
-        shutil.rmtree(self.locations.MASK_DIR)
         os.makedirs(self.locations.MASK_DIR)
 
         try:
@@ -266,7 +272,7 @@ class ImageUtils:
        files = [fn for fn in os.listdir(self.locations.MASK_DIR) if fn.endswith('.png')]
        indices = []
        for fn in files:
-           index  = int(fn.split('_')[2])  #A_S_5_t_HI.png = A, S, 5, t, HI.png
+           index  = int(fn.split('_')[3].split('.')[0])  #A_S_HI_5.png = A, S, HI, 5.png
            indices.append(index)
            indices.sort()
        return indices

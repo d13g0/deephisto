@@ -17,19 +17,25 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="CoverageDataManager">
+    <SUITE FILE_PATH="coverage/code$step_3_unpack_annotations.coverage" NAME="step_3_unpack_annotations Coverage Results" MODIFIED="1474664956544" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/steps" />
     <SUITE FILE_PATH="coverage/code$DemoSearch.coverage" NAME="DemoSearch Coverage Results" MODIFIED="1474009238140" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/deephisto" />
     <SUITE FILE_PATH="coverage/code$visualizer.coverage" NAME="visualizer Coverage Results" MODIFIED="1474210552505" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/code$net_interactor.coverage" NAME="net_interactor Coverage Results" MODIFIED="1474324168555" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/deephisto/caffe" />
+    <SUITE FILE_PATH="coverage/code$step_1_download_nifti_files.coverage" NAME="step_1_download_nifti_files Coverage Results" MODIFIED="1474659689019" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/steps" />
+    <SUITE FILE_PATH="coverage/code$step_4_visual_inspection.coverage" NAME="step_4_visual_inspection Coverage Results" MODIFIED="1474666903061" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/steps" />
     <SUITE FILE_PATH="coverage/code$NetworkDescriptor.coverage" NAME="NetworkDescriptor Coverage Results" MODIFIED="1473987048430" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/deephisto/caffe" />
     <SUITE FILE_PATH="coverage/code$TestNetwork.coverage" NAME="NetworkObserver Coverage Results" MODIFIED="1473989339906" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/deephisto/caffe" />
+    <SUITE FILE_PATH="coverage/code$step_5_create_patches.coverage" NAME="step_5_create_patches Coverage Results" MODIFIED="1474673993891" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/steps" />
+    <SUITE FILE_PATH="coverage/code$step_6_create_dataset.coverage" NAME="step_6_create_dataset Coverage Results" MODIFIED="1474673696452" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/steps" />
     <SUITE FILE_PATH="coverage/code$NetBuilder.coverage" NAME="NetBuilder Coverage Results" MODIFIED="1474398486011" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/deephisto/caffe" />
     <SUITE FILE_PATH="coverage/code$net_test.coverage" NAME="net_test Coverage Results" MODIFIED="1474406475282" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/code$sampling_demo.coverage" NAME="sampling_demo Coverage Results" MODIFIED="1474055013212" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/code$step_2_create_pngs.coverage" NAME="step_2_create_pngs Coverage Results" MODIFIED="1474661104172" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/steps" />
+    <SUITE FILE_PATH="coverage/code$sampling_demo.coverage" NAME="sampling_demo Coverage Results" MODIFIED="1474673683982" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/interact" />
     <SUITE FILE_PATH="coverage/code$dataset_creator.coverage" NAME="dataset_creator Coverage Results" MODIFIED="1474210923343" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/deephisto/dataset" />
-    <SUITE FILE_PATH="coverage/code$interpreter.coverage" NAME="interpreter Coverage Results" MODIFIED="1474317682249" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/code$interpreter.coverage" NAME="interpreter Coverage Results" MODIFIED="1474582686490" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/code$DatasetCreator.coverage" NAME="DatasetCreator Coverage Results" MODIFIED="1473914287004" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/deephisto" />
     <SUITE FILE_PATH="coverage/code$SlicePredictor.coverage" NAME="SlicePredictor Coverage Results" MODIFIED="1474010218923" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/deephisto/caffe" />
-    <SUITE FILE_PATH="coverage/code$main.coverage" NAME="main Coverage Results" MODIFIED="1474400392193" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/code$main.coverage" NAME="main Coverage Results" MODIFIED="1474672883919" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/steps" />
   </component>
   <component name="CreatePatchCommitExecutor">
     <option name="PATCH_PATH" value="" />
@@ -48,31 +54,22 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="main.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/main.py">
+      <file leaf-file-name="step_7_create_network.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/steps/step_7_create_network.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="386">
-              <caret line="52" column="24" selection-start-line="52" selection-start-column="24" selection-end-line="52" selection-end-column="24" />
-              <folding>
-                <element signature="e#2819#3857#0" expanded="false" />
-                <element signature="e#3544#3628#0" expanded="false" />
-              </folding>
+            <state relative-caret-position="18">
+              <caret line="1" column="36" selection-start-line="1" selection-start-column="36" selection-end-line="1" selection-end-column="36" />
+              <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="interpreter.py" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/interpreter.py">
+      <file leaf-file-name="step_6_create_dataset.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/steps/step_6_create_dataset.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="375">
-              <caret line="209" column="21" selection-start-line="209" selection-start-column="21" selection-end-line="209" selection-end-column="21" />
-              <folding>
-                <element signature="e#4182#4274#0" expanded="false" />
-                <element signature="e#6034#6845#0" expanded="false" />
-                <element signature="e#6884#7070#0" expanded="false" />
-                <element signature="e#7636#8128#0" expanded="false" />
-                <element signature="e#8167#8230#0" expanded="false" />
-              </folding>
+            <state relative-caret-position="108">
+              <caret line="6" column="0" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -90,43 +87,35 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="file://$PROJECT_DIR$/main.py" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/steps/subjects.py" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/steps/step_7_create_network.py" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/steps/step_6_create_dataset.py" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/interact/sampling_demo.py" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/deephisto/caffe/__init__.py" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/steps/step_4_visual_inspection.py" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/steps/step_3_unpack_annotations.py" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/steps/step_2_create_pngs.py" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/interact/__init__.py" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/steps/step_5_create_patches.py" root0="SKIP_INSPECTION" />
     <setting file="file://$PROJECT_DIR$/deephisto/dataset/dataset_creator.py" root0="SKIP_INSPECTION" />
     <setting file="file://$PROJECT_DIR$/deephisto/caffe/DataLayer.py" root0="SKIP_INSPECTION" />
     <setting file="file://$PROJECT_DIR$/deephisto/patch/patch_sampler.py" root0="SKIP_INSPECTION" />
-    <setting file="file://$PROJECT_DIR$/visualizer.py" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/interact/visualizer.py" root0="SKIP_INSPECTION" />
     <setting file="file://$PROJECT_DIR$/deephisto/patch/patch_creator.py" root0="SKIP_INSPECTION" />
     <setting file="file://$PROJECT_DIR$/deephisto/locations.py" root0="SKIP_INSPECTION" />
-    <setting file="file://$PROJECT_DIR$/sampling_demo.py" root0="SKIP_INSPECTION" />
     <setting file="file://$PROJECT_DIR$/deephisto/caffe/CaffeLocations.py" root0="SKIP_INSPECTION" />
     <setting file="file://$PROJECT_DIR$/deephisto/image/image_retriever.py" root0="SKIP_INSPECTION" />
     <setting file="file://$PROJECT_DIR$/deephisto/utils/draggable_rectangle.py" root0="SKIP_INSPECTION" />
     <setting file="file://$PROJECT_DIR$/deephisto/caffe/net_test.py" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/steps/step_1_download_nifti_files.py" root0="SKIP_INSPECTION" />
     <setting file="file://$PROJECT_DIR$/deephisto/caffe/net_interactor.py" root0="SKIP_INSPECTION" />
-    <setting file="file://$PROJECT_DIR$/deephisto/caffe/__init__.py" root0="SKIP_INSPECTION" />
     <setting file="file://$PROJECT_DIR$/deephisto/caffe/net_builder.py" root0="SKIP_INSPECTION" />
-    <setting file="file://$PROJECT_DIR$/interpreter.py" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/interact/interpreter.py" root0="SKIP_INSPECTION" />
     <setting file="file://$PROJECT_DIR$/deephisto/image/image_utils.py" root0="SKIP_INSPECTION" />
   </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/deephisto/caffe/NetworkObserver.py" />
-        <option value="$PROJECT_DIR$/deephisto/caffe/SlicePredictor.py" />
-        <option value="$PROJECT_DIR$/deephisto/PatchVisualizer.py" />
-        <option value="$PROJECT_DIR$/deephisto/caffe/NetTest.py" />
-        <option value="$PROJECT_DIR$/deephisto/caffe/Interpreter.py" />
-        <option value="$PROJECT_DIR$/deephisto/PatchCreator.py" />
-        <option value="$PROJECT_DIR$/deephisto/DemoSearch.py" />
-        <option value="$PROJECT_DIR$/deephisto/PatchSamplingDemo.py" />
-        <option value="$PROJECT_DIR$/deephisto/Visualizer.py" />
-        <option value="$PROJECT_DIR$/deephisto/Sampler.py" />
-        <option value="$PROJECT_DIR$/deephisto/DatasetCreator.py" />
-        <option value="$PROJECT_DIR$/deephisto/caffe/SliceTest.py" />
-        <option value="$PROJECT_DIR$/deephisto/SliceTest.py" />
-        <option value="$PROJECT_DIR$/SliceTest.py" />
-        <option value="$PROJECT_DIR$/deephisto/caffe/NetInteractor.py" />
-        <option value="$PROJECT_DIR$/deephisto/ImageUtils.py" />
         <option value="$PROJECT_DIR$/deephisto/DraggableRectangle.py" />
         <option value="$PROJECT_DIR$/deephisto/image/utils.py" />
         <option value="$PROJECT_DIR$/deephisto/image/retriever.py" />
@@ -134,20 +123,16 @@
         <option value="$PROJECT_DIR$/deephisto/dataset/Creator.py" />
         <option value="$PROJECT_DIR$/deephisto/dataset/datasetcreator.py" />
         <option value="$PROJECT_DIR$/deephisto/image/imageutils.py" />
-        <option value="$PROJECT_DIR$/deephisto/image/image_retriever.py" />
         <option value="$PROJECT_DIR$/deephisto/dataset/__init__.py" />
         <option value="$PROJECT_DIR$/deephisto/patch/creator.py" />
         <option value="$PROJECT_DIR$/deephisto/patch/sampler.py" />
         <option value="$PROJECT_DIR$/deephisto/utils/__init__.py" />
-        <option value="$PROJECT_DIR$/deephisto/__init__.py" />
         <option value="$PROJECT_DIR$/deephisto/patch/__init__.py" />
         <option value="$PROJECT_DIR$/deephisto/caffe/net_builder_small.py" />
         <option value="$PROJECT_DIR$/deephisto/caffe/net_builder_simple.py" />
         <option value="$PROJECT_DIR$/deephisto/caffe/NetBuilder.py" />
         <option value="$PROJECT_DIR$/net_test.py" />
         <option value="$PROJECT_DIR$/deephisto/caffe/__init__.py" />
-        <option value="$PROJECT_DIR$/deephisto/image/image_utils.py" />
-        <option value="$PROJECT_DIR$/deephisto/locations.py" />
         <option value="$PROJECT_DIR$/deephisto/caffe/CaffeLocations.py" />
         <option value="$PROJECT_DIR$/sampling_demo.py" />
         <option value="$PROJECT_DIR$/deephisto/patch/patch_sampler.py" />
@@ -157,11 +142,31 @@
         <option value="$PROJECT_DIR$/deephisto/caffe/DataLayer.py" />
         <option value="$PROJECT_DIR$/deephisto/utils/draggable_rectangle.py" />
         <option value="$PROJECT_DIR$/visualizer.py" />
-        <option value="$PROJECT_DIR$/deephisto/caffe/net_interactor.py" />
-        <option value="$PROJECT_DIR$/interpreter.py" />
-        <option value="$PROJECT_DIR$/deephisto/caffe/net_builder.py" />
-        <option value="$PROJECT_DIR$/main.py" />
         <option value="$PROJECT_DIR$/deephisto/caffe/net_test.py" />
+        <option value="$PROJECT_DIR$/deephisto/__init__.py" />
+        <option value="$PROJECT_DIR$/deephisto/caffe/net_interactor.py" />
+        <option value="$PROJECT_DIR$/deephisto/caffe/net_builder.py" />
+        <option value="$PROJECT_DIR$/interpreter.py" />
+        <option value="$PROJECT_DIR$/step_1_retrieve_images.py" />
+        <option value="$PROJECT_DIR$/main.py" />
+        <option value="$PROJECT_DIR$/subjects.py" />
+        <option value="$PROJECT_DIR$/step_1_download_nifti_files.py" />
+        <option value="$PROJECT_DIR$/deephisto/image/image_retriever.py" />
+        <option value="$PROJECT_DIR$/steps/subjects.py" />
+        <option value="$PROJECT_DIR$/steps/step_1_download_nifti_files.py" />
+        <option value="$PROJECT_DIR$/steps/step_2_create_pngs.py" />
+        <option value="$PROJECT_DIR$/steps/step_3_unpack_annotations.py" />
+        <option value="$PROJECT_DIR$/interact/__init__.py" />
+        <option value="$PROJECT_DIR$/interact/interpreter.py" />
+        <option value="$PROJECT_DIR$/deephisto/locations.py" />
+        <option value="$PROJECT_DIR$/deephisto/image/image_utils.py" />
+        <option value="$PROJECT_DIR$/interact/visualizer.py" />
+        <option value="$PROJECT_DIR$/steps/step_4_visual_inspection.py" />
+        <option value="$PROJECT_DIR$/steps/step_6_create_dataset.py" />
+        <option value="$PROJECT_DIR$/steps/step_7_create_network.py" />
+        <option value="$PROJECT_DIR$/steps/main.py" />
+        <option value="$PROJECT_DIR$/interact/sampling_demo.py" />
+        <option value="$PROJECT_DIR$/steps/step_5_create_patches.py" />
       </list>
     </option>
   </component>
@@ -172,10 +177,10 @@
     <sorting>DEFINITION_ORDER</sorting>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="119" />
-    <option name="y" value="34" />
-    <option name="width" value="1714" />
-    <option name="height" value="996" />
+    <option name="x" value="-2" />
+    <option name="y" value="25" />
+    <option name="width" value="1924" />
+    <option name="height" value="1023" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
@@ -242,28 +247,6 @@
               <option name="myItemId" value="External Libraries" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ExternalLibrariesNode" />
             </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="&lt; Python 2.7.12 (/usr/local/anaconda/bin/python) &gt;" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.NamedLibraryElementNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="code" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="External Libraries" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ExternalLibrariesNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="&lt; Python 2.7.12 (/usr/local/anaconda/bin/python) &gt;" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.NamedLibraryElementNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="python2.7" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
           </PATH>
           <PATH>
             <PATH_ELEMENT>
@@ -285,7 +268,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="deephisto" />
+              <option name="myItemId" value="steps" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -299,47 +282,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="deephisto" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="patch" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="code" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="code" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="deephisto" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="image" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="code" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="code" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="deephisto" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="caffe" />
+              <option name="myItemId" value="interact" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -373,106 +316,105 @@
     </option>
   </component>
   <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/steps" />
+      <recent name="$PROJECT_DIR$/interact" />
+      <recent name="$PROJECT_DIR$/deephisto/caffe" />
+      <recent name="$PROJECT_DIR$/deephisto" />
+      <recent name="$PROJECT_DIR$/deephisto/image" />
+    </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/deephisto/caffe" />
       <recent name="$PROJECT_DIR$/deephisto" />
     </key>
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/deephisto/caffe" />
-      <recent name="$PROJECT_DIR$/deephisto" />
-      <recent name="$PROJECT_DIR$/deephisto/image" />
-      <recent name="$PROJECT_DIR$/deephisto/utils" />
-      <recent name="$PROJECT_DIR$/deephisto/dataset" />
-    </key>
   </component>
-  <component name="RunManager" selected="Python.net_test">
+  <component name="RunManager" selected="Python.step_5_create_patches">
+    <configuration default="false" name="step_4_visual_inspection" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/steps" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="code" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/steps/step_4_visual_inspection.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <method />
+    </configuration>
+    <configuration default="false" name="step_5_create_patches" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/steps" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="code" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/steps/step_5_create_patches.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <method />
+    </configuration>
+    <configuration default="false" name="step_6_create_dataset" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/steps" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="code" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/steps/step_6_create_dataset.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <method />
+    </configuration>
     <configuration default="false" name="main" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
-        <env name="PYTHONPATH" value="/home/dcantor/projects/deephisto/code/deephisto/caffe" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/steps" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="code" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/steps/main.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <method />
     </configuration>
-    <configuration default="false" name="net_test" type="PythonConfigurationType" factoryName="Python" temporary="true">
+    <configuration default="false" name="sampling_demo" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/interact" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="code" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/deephisto/caffe/net_test.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <method />
-    </configuration>
-    <configuration default="false" name="NetBuilder" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/deephisto/caffe" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="code" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/deephisto/caffe/net_builder.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <method />
-    </configuration>
-    <configuration default="false" name="interpreter" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="code" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/interpreter.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <method />
-    </configuration>
-    <configuration default="false" name="net_interactor" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/deephisto/caffe" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="code" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/deephisto/caffe/net_interactor.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/interact/sampling_demo.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <method />
@@ -686,19 +628,19 @@
       <method />
     </configuration>
     <list size="5">
-      <item index="0" class="java.lang.String" itemvalue="Python.main" />
-      <item index="1" class="java.lang.String" itemvalue="Python.net_test" />
-      <item index="2" class="java.lang.String" itemvalue="Python.NetBuilder" />
-      <item index="3" class="java.lang.String" itemvalue="Python.interpreter" />
-      <item index="4" class="java.lang.String" itemvalue="Python.net_interactor" />
+      <item index="0" class="java.lang.String" itemvalue="Python.step_4_visual_inspection" />
+      <item index="1" class="java.lang.String" itemvalue="Python.step_5_create_patches" />
+      <item index="2" class="java.lang.String" itemvalue="Python.step_6_create_dataset" />
+      <item index="3" class="java.lang.String" itemvalue="Python.main" />
+      <item index="4" class="java.lang.String" itemvalue="Python.sampling_demo" />
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="Python.net_test" />
-        <item index="1" class="java.lang.String" itemvalue="Python.main" />
-        <item index="2" class="java.lang.String" itemvalue="Python.NetBuilder" />
-        <item index="3" class="java.lang.String" itemvalue="Python.net_interactor" />
-        <item index="4" class="java.lang.String" itemvalue="Python.interpreter" />
+        <item index="0" class="java.lang.String" itemvalue="Python.step_5_create_patches" />
+        <item index="1" class="java.lang.String" itemvalue="Python.step_6_create_dataset" />
+        <item index="2" class="java.lang.String" itemvalue="Python.sampling_demo" />
+        <item index="3" class="java.lang.String" itemvalue="Python.main" />
+        <item index="4" class="java.lang.String" itemvalue="Python.step_4_visual_inspection" />
       </list>
     </recent_temporary>
   </component>
@@ -745,21 +687,21 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="119" y="34" width="1714" height="996" extended-state="1" />
+    <frame x="-2" y="25" width="1924" height="1023" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.26558754" sideWeight="0.4275862" order="1" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24600638" sideWeight="0.49363866" order="1" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.42307693" sideWeight="0.5181044" order="0" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32960597" sideWeight="0.5" order="4" side_tool="true" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.31523022" sideWeight="0.46822542" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.42468855" sideWeight="0.46379128" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.29802954" sideWeight="0.67785233" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3364817" sideWeight="0.49220625" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.31523022" sideWeight="0.5317746" order="10" side_tool="true" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.26558754" sideWeight="0.5724138" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33638445" sideWeight="0.48988286" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.5503433" sideWeight="0.5101172" order="10" side_tool="true" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24600638" sideWeight="0.5063613" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32821724" sideWeight="0.49760193" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.15930901" sideWeight="0.5212224" order="0" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.30995205" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4174654" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -815,85 +757,11 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="56" />
+      <option name="time" value="63" />
     </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/../../../../tools/caffe/python/caffe/net_spec.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-6">
-          <caret line="168" column="8" selection-start-line="168" selection-start-column="8" selection-end-line="168" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../../../tools/caffe/python/caffe/draw.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="336">
-          <caret line="235" column="32" selection-start-line="235" selection-start-column="17" selection-end-line="235" selection-end-column="32" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../../../tools/caffe/python/caffe/coord_map.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="172">
-          <caret line="148" column="17" selection-start-line="148" selection-start-column="17" selection-end-line="148" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:///usr/local/anaconda/lib/python2.7/site-packages/numpy/core/numeric.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="180">
-          <caret line="1868" column="0" selection-start-line="1868" selection-start-column="0" selection-end-line="1868" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/.PyCharm2016.2/system/python_stubs/-1469818854/numpy/core/umath.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-258">
-          <caret line="3253" column="4" selection-start-line="3253" selection-start-column="4" selection-end-line="3253" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/.PyCharm2016.2/system/python_stubs/-1469818854/caffe/_caffe.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="298">
-          <caret line="957" column="8" selection-start-line="957" selection-start-column="8" selection-end-line="957" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/pydevd.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="215">
-          <caret line="963" column="0" selection-start-line="963" selection-start-column="0" selection-end-line="963" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:///usr/local/anaconda/lib/python2.7/multiprocessing/process.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="153">
-          <caret line="113" column="0" selection-start-line="113" selection-start-column="0" selection-end-line="113" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:///usr/local/anaconda/lib/python2.7/site-packages/matplotlib/backend_bases.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="171">
-          <caret line="174" column="0" selection-start-line="174" selection-start-column="0" selection-end-line="174" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/deephisto/caffe/simple.png">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/deephisto/caffe/train.png">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/deephisto/caffe/NetBuilder" />
     <entry file="file:///usr/local/anaconda/lib/python2.7/site-packages/matplotlib/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="141">
@@ -928,13 +796,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="36">
           <caret line="2" column="0" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/deephisto/image/image_retriever.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="162">
-          <caret line="14" column="16" selection-start-line="14" selection-start-column="6" selection-end-line="14" selection-end-column="20" />
         </state>
       </provider>
     </entry>
@@ -995,41 +856,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file:///usr/local/anaconda/lib/python2.7/site-packages/PIL/Image.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="192">
-          <caret line="1951" column="0" selection-start-line="1951" selection-start-column="0" selection-end-line="1951" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/deephisto/locations.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-774">
-          <caret line="8" column="6" selection-start-line="8" selection-start-column="6" selection-end-line="8" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/deephisto/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="158">
-          <caret line="10" column="34" selection-start-line="10" selection-start-column="34" selection-end-line="10" selection-end-column="34" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/deephisto/caffe/CaffeLocations.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="18">
-          <caret line="1" column="0" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/sampling_demo.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-166">
-          <caret line="42" column="60" selection-start-line="42" selection-start-column="60" selection-end-line="42" selection-end-column="60" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file:///usr/local/anaconda/lib/python2.7/site-packages/sklearn/cross_validation.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-457">
@@ -1044,13 +870,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/deephisto/dataset/dataset_creator.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="83">
-          <caret line="68" column="74" selection-start-line="68" selection-start-column="74" selection-end-line="68" selection-end-column="74" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/deephisto/utils/draggable_rectangle.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="142">
@@ -1058,25 +877,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/visualizer.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="31">
-          <caret line="387" column="5" selection-start-line="387" selection-start-column="5" selection-end-line="387" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file:///usr/local/anaconda/lib/python2.7/cmd.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="634">
           <caret line="220" column="0" selection-start-line="220" selection-start-column="0" selection-end-line="220" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:///usr/local/anaconda/lib/python2.7/site-packages/matplotlib/pyplot.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-446">
-          <caret line="934" column="4" selection-start-line="934" selection-start-column="4" selection-end-line="934" selection-end-column="4" />
           <folding />
         </state>
       </provider>
@@ -1089,22 +893,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/deephisto/image/image_utils.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="327">
-          <caret line="257" column="24" selection-start-line="257" selection-start-column="24" selection-end-line="257" selection-end-column="24" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/deephisto/patch/patch_creator.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-278">
-          <caret line="20" column="8" selection-start-line="20" selection-start-column="8" selection-end-line="20" selection-end-column="8" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/deephisto/caffe/DataLayer.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="30">
@@ -1113,74 +901,270 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/main.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="386">
-          <caret line="52" column="24" selection-start-line="52" selection-start-column="24" selection-end-line="52" selection-end-column="24" />
-          <folding>
-            <element signature="e#2819#3857#0" expanded="false" />
-            <element signature="e#3544#3628#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/deephisto/caffe/net_builder.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1998">
-          <caret line="112" column="42" selection-start-line="112" selection-start-column="42" selection-end-line="112" selection-end-column="42" />
-          <folding>
-            <element signature="e#1006#1081#0" expanded="false" />
-            <element signature="e#7154#7953#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/deephisto/caffe/LossLayer.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="342">
           <caret line="19" column="8" selection-start-line="19" selection-start-column="8" selection-end-line="19" selection-end-column="8" />
           <folding>
-            <element signature="e#0#10#0" expanded="true" />
+            <element signature="e#0#10#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/local/anaconda/lib/python2.7/site-packages/matplotlib/animation.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="183">
+          <caret line="416" column="6" selection-start-line="416" selection-start-column="6" selection-end-line="416" selection-end-column="6" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/deephisto/caffe/CaffeLocations.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="342">
+          <caret line="19" column="29" selection-start-line="19" selection-start-column="29" selection-end-line="19" selection-end-column="29" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/local/anaconda/lib/python2.7/site-packages/PIL/Image.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="148">
+          <caret line="1951" column="0" selection-start-line="1951" selection-start-column="0" selection-end-line="1951" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/local/anaconda/lib/python2.7/site-packages/matplotlib/figure.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="186">
+          <caret line="1475" column="0" selection-start-line="1475" selection-start-column="0" selection-end-line="1475" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/deephisto/caffe/net_test.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="414">
+          <caret line="85" column="54" selection-start-line="85" selection-start-column="8" selection-end-line="85" selection-end-column="54" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/local/anaconda/lib/python2.7/site-packages/matplotlib/pyplot.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1526">
+          <caret line="934" column="4" selection-start-line="934" selection-start-column="4" selection-end-line="934" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/deephisto/caffe/net_builder.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="387">
+          <caret line="225" column="0" selection-start-line="225" selection-start-column="0" selection-end-line="225" selection-end-column="0" />
+          <folding>
+            <element signature="e#1006#1081#0" expanded="false" />
+            <element signature="e#7088#7887#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/deephisto/caffe/net_interactor.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-475">
-          <caret line="253" column="8" selection-start-line="253" selection-start-column="8" selection-end-line="253" selection-end-column="8" />
+        <state relative-caret-position="421">
+          <caret line="64" column="55" selection-start-line="64" selection-start-column="55" selection-end-line="64" selection-end-column="55" />
           <folding>
-            <element signature="e#982#1224#0" expanded="false" />
-            <element signature="e#1261#1839#0" expanded="false" />
-            <element signature="e#1923#2112#0" expanded="false" />
-            <element signature="e#3222#4144#0" expanded="false" />
-            <element signature="e#4211#5899#0" expanded="false" />
-            <element signature="e#5966#6457#0" expanded="false" />
-            <element signature="e#7529#8276#0" expanded="false" />
-            <element signature="e#11602#12031#0" expanded="false" />
+            <element signature="e#3739#4661#0" expanded="false" />
+            <element signature="e#4728#6416#0" expanded="false" />
+            <element signature="e#6483#6974#0" expanded="false" />
+            <element signature="e#7011#7419#0" expanded="false" />
+            <element signature="e#7460#8009#0" expanded="false" />
+            <element signature="e#10745#11231#0" expanded="false" />
+            <element signature="e#11316#12796#0" expanded="false" />
+            <element signature="e#12849#13278#0" expanded="false" />
+            <element signature="e#13326#13683#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/deephisto/caffe/net_test.py">
+    <entry file="file://$PROJECT_DIR$/deephisto/image/image_retriever.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="390">
-          <caret line="193" column="17" selection-start-line="193" selection-start-column="17" selection-end-line="193" selection-end-column="17" />
+        <state relative-caret-position="630">
+          <caret line="35" column="60" selection-start-line="35" selection-start-column="60" selection-end-line="35" selection-end-column="60" />
+          <folding>
+            <element signature="e#87#99#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/steps/step_1_download_nifti_files.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="334">
+          <caret line="40" column="38" selection-start-line="40" selection-start-column="38" selection-end-line="40" selection-end-column="38" />
+          <folding>
+            <element signature="e#0#37#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/steps/subjects.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="126">
+          <caret line="7" column="17" selection-start-line="7" selection-start-column="17" selection-end-line="7" selection-end-column="17" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/interpreter.py">
+    <entry file="file://$PROJECT_DIR$/deephisto/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="375">
-          <caret line="209" column="21" selection-start-line="209" selection-start-column="21" selection-end-line="209" selection-end-column="21" />
+        <state relative-caret-position="90">
+          <caret line="5" column="3" selection-start-line="5" selection-start-column="3" selection-end-line="5" selection-end-column="3" />
           <folding>
-            <element signature="e#4182#4274#0" expanded="false" />
-            <element signature="e#6034#6845#0" expanded="false" />
-            <element signature="e#6884#7070#0" expanded="false" />
-            <element signature="e#7636#8128#0" expanded="false" />
-            <element signature="e#8167#8230#0" expanded="false" />
+            <element signature="e#86#119#0" expanded="false" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/steps/step_2_create_pngs.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="234">
+          <caret line="13" column="28" selection-start-line="13" selection-start-column="28" selection-end-line="13" selection-end-column="28" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/steps/step_3_unpack_annotations.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="318">
+          <caret line="22" column="0" selection-start-line="22" selection-start-column="0" selection-end-line="25" selection-end-column="46" />
+          <folding>
+            <element signature="e#0#37#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/interact/interpreter.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="5" column="29" selection-start-line="5" selection-start-column="29" selection-end-line="5" selection-end-column="29" />
+          <folding>
+            <element signature="e#4366#4458#0" expanded="false" />
+            <element signature="e#8361#8853#0" expanded="false" />
+            <element signature="e#8892#8955#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/deephisto/locations.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1338">
+          <caret line="26" column="13" selection-start-line="26" selection-start-column="13" selection-end-line="26" selection-end-column="13" />
+          <folding>
+            <element signature="e#86#103#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/deephisto/image/image_utils.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="160">
+          <caret line="79" column="8" selection-start-line="79" selection-start-column="8" selection-end-line="79" selection-end-column="8" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/interact/visualizer.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="175" column="13" selection-start-line="175" selection-start-column="13" selection-end-line="175" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/steps/step_4_visual_inspection.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="216">
+          <caret line="12" column="0" selection-start-line="12" selection-start-column="0" selection-end-line="17" selection-end-column="39" />
+          <folding>
+            <element signature="e#0#37#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/deephisto/dataset/dataset_creator.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="18">
+          <caret line="38" column="0" selection-start-line="38" selection-start-column="0" selection-end-line="38" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/steps/main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="98">
+          <caret line="20" column="12" selection-start-line="20" selection-start-column="12" selection-end-line="20" selection-end-column="12" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/deephisto/patch/patch_creator.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-8">
+          <caret line="55" column="49" selection-start-line="55" selection-start-column="49" selection-end-line="55" selection-end-column="49" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/steps/step_7_create_network.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="18">
+          <caret line="1" column="36" selection-start-line="1" selection-start-column="36" selection-end-line="1" selection-end-column="36" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/interact/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="18">
+          <caret line="1" column="34" selection-start-line="1" selection-start-column="34" selection-end-line="1" selection-end-column="34" />
+          <folding>
+            <element signature="e#0#35#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/steps/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/interact/sampling_demo.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="194">
+          <caret line="69" column="33" selection-start-line="69" selection-start-column="33" selection-end-line="69" selection-end-column="33" />
+          <folding>
+            <element signature="e#0#32#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/steps/step_5_create_patches.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="446">
+          <caret line="36" column="0" selection-start-line="36" selection-start-column="0" selection-end-line="36" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/steps/step_6_create_dataset.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="108">
+          <caret line="6" column="0" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>

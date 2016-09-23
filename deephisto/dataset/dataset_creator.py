@@ -81,7 +81,7 @@ class DatasetCreator:
 
         training_txt = self.locations.TRAINING_TXT%DS_DIR
 
-        self.locations.check_dir(training_txt)
+        self.locations.check_dir_of(training_txt)
 
         with open(training_txt,'wb') as training_file:
             writer = csv.writer(training_file, delimiter=';')

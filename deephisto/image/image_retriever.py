@@ -18,66 +18,45 @@ class ImageRetriever:
     and processing
     """
     
-    def __init__(self, locations):
+    def __init__(self, locations, sources, targets):
         self.locations = locations
-        self.configure()
-        self.subject = None
-        
+        self.subject = {}
+        self.sources = sources
+        self.targets = targets
 
-    def configure(self):
-        """
-        Configure the paths for the ImageRetriever object to operate
-        Change the remote directories according to your mount point (keep the wildcard %s)
-        """
-        root = self.locations.ROOT_DIR
 
-        local_exvivo_dir = root + '/subjects/%s/exvivo/'
-        local_histo_dir = root + '/subjects/%s/hist/'
 
-        remote_exvivo_dir = '/home/dcantor/epilepsy/%s/Processed/Ex-Hist_Reg/9.4T/Neo/aligned_Ex_100um/'
-        remote_histo_dir = '/home/dcantor/histology/Histology/%s/100um_5umPad_FeatureMaps/aligned/Neo_NEUN/'
+    def set_subject(self, name):
 
-        self.source = {
-            'FA': remote_exvivo_dir + 'dti_smoothed_0.2/dti_FA.100um.nii.gz',
-            'MD': remote_exvivo_dir + 'dti_smoothed_0.2/dti_MD.100um.nii.gz',
-            'MR': remote_exvivo_dir + 'reg_ex_mri_100um.nii.gz',
-            'HI': remote_histo_dir  + 'count_deformable_100um.nii.gz'
-        }
-        
+        self.subject['name'] = name
+        self.subject['source'] = {}
+        self.subject['target'] = {}
 
-        self.target = {
-            'FA': local_exvivo_dir + 'dti_FA.100um.nii.gz',
-            'MD': local_exvivo_dir + 'dti_MD.100um.nii.gz',
-            'MR': local_exvivo_dir + 'reg_ex_mri_100um.nii.gz',
-            'HI': local_histo_dir  + 'count_deformable_100um.nii.gz'
-            
-        }
-        
-    def set_subject(self, subject):
-        self.subject = subject
-        self.configure()
-        print 'ImageRetriever: looking at subject %s'%subject
-        for key,item in self.source.iteritems():
-            self.source[key] = item%subject
+
+        print 'ImageRetriever: looking at subject %s' % name
+
+        for key, path in self.sources.iteritems():
+            self.subject['source'][key] = path % name
               
-        for key, item in self.target.iteritems():
-            self.target[key] = item%subject
+
+        for key, path in self.targets.iteritems():
+            self.subject['target'][key] = path % name
         
         
-    def inspect_subject(self, subject):
+    def inspect_subject(self, name):
         """
         Determines if all the required files exist in the database for a given subject
         """
-        
+        print
         print '--------------------------------------------------------------'
-        print ' Inspecting subject %s' % Console.BOLD + subject + Console.ENDC
+        print ' Inspecting subject %s' % Console.BOLD + name + Console.ENDC
         print '--------------------------------------------------------------'
         
-        self.set_subject(subject)
+        self.set_subject(name)
         
         subject_ok = True
         
-        for key,item in self.source.iteritems():
+        for key,item in self.subject['source'].iteritems():
     
             if os.path.exists(item):
                 flag = Console.OKGREEN + 'OK' + Console.ENDC
@@ -95,19 +74,17 @@ class ImageRetriever:
         
         
 
-    def retrieve(self,subject):
-        if subject is None:
-            subject = self.subject
+    def retrieve(self,name):
 
-        if not self.inspect_subject(subject):
+        if not self.inspect_subject(name):
             print 'Something is missing. Data for this subject cannot be retrieved'
             return
    
      
         
-        for key in self.target.keys():
-            origen  = self.source[key]
-            destino = self.target[key]
+        for key in self.subject['target'].keys():
+            origen  = self.subject['source'][key]
+            destino = self.subject['target'][key]
             if not os.path.exists(os.path.dirname(destino)):
                 try:
                     os.makedirs(os.path.dirname(destino))

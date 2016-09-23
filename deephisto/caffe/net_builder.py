@@ -66,11 +66,10 @@ class NetBuilder:
 
 
         if stage != CaffeLocations.STAGE_DEPLOY:
-            source_params = dict(stage=stage)  # ,  seed=1337)
+            source_params = dict(stage=stage)
             source_params['data_dir'] = self.DATA_DIR
             source_params['split_dir'] = self.SPLIT_DIR
             source_params['data_augmentation'] = False
-            #source_params['random'] = False
             n.data, n.label = L.Python(module='DataLayer',
                                        layer='DataLayer',
                                        ntop=2,
@@ -122,7 +121,7 @@ class NetBuilder:
         n.deconv = L.Deconvolution(n.score_fr,
                                    convolution_param=dict(
                                            num_output=CaffeLocations.NUM_LABELS,
-                                           kernel_size=64, #64
+                                           kernel_size=64,
                                            stride=32,
                                            bias_term=False,
                                            weight_filler=dict(type='xavier'),
@@ -223,8 +222,4 @@ class NetBuilder:
         #plt.imshow(im)
         #plt.show()
 
-
-if __name__ == '__main__':
-    nd = NetBuilder('dh28', 28, data_dir='28x28')
-    nd.make()
 

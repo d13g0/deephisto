@@ -16,10 +16,10 @@ from matplotlib import gridspec
 import Image
 import Tkinter as Tk
 
-from deephisto.locations import Locations
-from deephisto.image import ImageUtils
-from deephisto.patch import PatchSampler
-from deephisto.utils import DraggableRectangle
+from locations import Locations
+from image import ImageUtils
+from patch import PatchSampler
+from utils import DraggableRectangle
 
 
 
@@ -173,6 +173,7 @@ class Visualizer:
 
         self.reset()
 
+        print
         print 'Setting subject for PatchVisualizer'
         print '---------------------------------------'
 
@@ -429,8 +430,8 @@ class Visualizer:
         self._zoom_histo(x, y)
         for i, ax in enumerate(self.axs):
             self._ax = ax
-            self.drs[i].rect.set_x(x - PatchSampler.WSIDE)
-            self.drs[i].rect.set_y(y - PatchSampler.WSIDE)
+            self.drs[i].rect.set_x(x - self.WSIDE)
+            self.drs[i].rect.set_y(y - self.WSIDE)
         self.fig.canvas.draw()
 
     def update(self):

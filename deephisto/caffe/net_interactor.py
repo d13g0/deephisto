@@ -35,8 +35,9 @@ class NetInteractor:
         self.training_data = None
         self.mean = CaffeLocations.TRAINING_MEAN #None
         self.data_dir = None
-        self.PANEL_ROWS = 4
-        self.PANEL_COLS = 3
+        self.PANEL_ROWS = 5
+        self.PANEL_COLS = 4
+        self.verbose = True
 
     def load_avg_image(self):
         avg_img_file = CaffeLocations.SPLIT_DIR + '/' + self.data_dir + '/' + CaffeLocations.AVG_IMG
@@ -44,27 +45,43 @@ class NetInteractor:
         #print 'Average training image %s loaded'%avg_img_file
 
 
-    def load_lists(self):
-        datafile = CaffeLocations.SPLIT_DIR + '/%s/validation.txt'%self.data_dir
+    def load_lists(self, data_dir=None):
+
+        if data_dir == None:
+            data_dir = self.data_dir
+
+        datafile = CaffeLocations.SPLIT_DIR + '/%s/validation.txt'%data_dir
         with open(datafile, 'r') as dfile:
             lines = dfile.read().splitlines()
             self.validation_data = [f.split(';')[0] for f in lines]
             #print 'Training split %s loaded' % datafile
 
-        datafile = CaffeLocations.SPLIT_DIR + '/%s/training.txt'%self.data_dir
+        datafile = CaffeLocations.SPLIT_DIR + '/%s/training.txt'%data_dir
         with open(datafile, 'r') as dfile:
             lines = dfile.read().splitlines()
             self.training_data = [f.split(';')[0] for f in lines]
             #print 'Validation split %s loaded'%datafile
 
+        return self.training_data, self.validation_data
 
-    def configure_sequence(self, directory, start, end, step, data_dir):
+    def set_animation_params(self, directory, start, end, step, data_dir):
         self.directory = directory
         self.start = start
         self.end = end
         self.step = step
         self.load_model(directory, start, data_dir)
-        print 'Observer configured'
+
+        if self.verbose:
+
+            print
+            print 'Animation params'
+            print '-----------------'
+            print '  net dir         :%s'%directory
+            print '  data dir        :%s' % data_dir
+            print '  start           :%d'%start
+            print '  end             :%d'%end
+            print '  step            :%d'%step
+
 
     def load_model(self, directory, epoch, data_dir):
         """
@@ -87,8 +104,8 @@ class NetInteractor:
         model = CaffeLocations.NET_DIR + '/'+ directory +'/'+ CaffeLocations.DEPLOY_PROTO
         self.net = caffe.Net(model, caffe.TEST, weights=weights)
 
-
-        print ' directory: %s epoch: %s  data:%s' % (directory, epoch, data_dir)
+        if self.verbose:
+            print 'directory: %s epoch: %s  data:%s' % (directory, epoch, data_dir)
 
     def show_network_model(self):
         net = self.net
@@ -216,22 +233,27 @@ class NetInteractor:
         ROWS = self.PANEL_ROWS
         COLS = self.PANEL_COLS
 
-        fig, ax = plt.subplots(ROWS, COLS * 2, figsize=(12, 12), squeeze=False)
-        fig.canvas.set_window_title('DeepHisto Sampler [dir: %s, epoch: %d]' % (self.directory, self.epoch))
+        fig, ax = plt.subplots(ROWS, COLS * 2,  squeeze=False, facecolor='black', figsize=(12,8))
+        fig.canvas.set_window_title('DeepHisto Training [dir: %s, epoch: %d]' % (self.directory, self.epoch))
+        fig.suptitle('DeepHisto Training [dir: %s, epoch: %d]' % (self.directory, self.epoch))
+
         for i, j in product(range(0,  ROWS), range(0, COLS*2)):
             k = j*ROWS + i
 
             if (i == 0):
                 if (j % 2 ==0):
-                    ax[i, j].set_title('GT')
+                    ax[i, j].set_title('GT', color='white')
                 else:
-                    ax[i,j].set_title('PR')
+                    ax[i,j].set_title('PR', color='white')
 
             ax[i, j].get_xaxis().set_visible(False)
             ax[i, j].get_yaxis().set_visible(False)
+            ax[i, j].set_axis_bgcolor('black')
+            # ax[i, j].spines['top'].set_visible(False)
+            # ax[i, j].spines['right'].set_visible(False)
+            # ax[i, j].spines['bottom'].set_visible(False)
+        plt.subplots_adjust(top=0.9, left=0, bottom=0, right=1, wspace=0, hspace=0)
         plt.draw()
-        plt.subplots_adjust(left=0, bottom=0, right=1, wspace=0, hspace=0)
-
         self.fig = fig
         self.ax = ax
 
@@ -249,6 +271,7 @@ class NetInteractor:
             label = self.labels[k]
             ax[i,2*j].imshow(label, interpolation='None', cmap='jet', vmin=0, vmax=CaffeLocations.NUM_LABELS)
             ax[i,2*j].format_coord = self._get_formatter('Source:  %s' % self.filenames[k], label)
+        plt.subplots_adjust(top=0.9, left=0, bottom=0, right=1, wspace=0, hspace=0)
         plt.draw()
 
     def show_predictions(self):
@@ -259,12 +282,16 @@ class NetInteractor:
 
         assert len(self.predictions) == N, 'number of predictions need to match the dimensions of the panel'
 
+        self.fig.canvas.set_window_title('DeepHisto Training [dir: %s, epoch: %d]' % (self.directory, self.epoch))
+        self.fig.suptitle('%d' % self.epoch, fontsize=22, color='white')
+
         ax = self.ax
         for i, j in product(range(0, ROWS), range(0, COLS)):
             k = j * ROWS + i
             pred = self.predictions[k]
             self.ax[i, 2 * j + 1].imshow(pred, interpolation='None', cmap='jet', vmin=0,
                                          vmax=CaffeLocations.NUM_LABELS)
+        plt.subplots_adjust(top=0.9, left=0, bottom=0, right=1, wspace=0, hspace=0)
         plt.draw()
 
     def get_single_prediction(self, patch_name=None):
@@ -343,8 +370,6 @@ class NetInteractor:
 
         return formatter
 
-
-
     def next_epoch(self, loop=False):
         epoch = self.epoch
         step = self.step
@@ -358,11 +383,11 @@ class NetInteractor:
 
         self.epoch = epoch + step
         self.load_model(self.directory, self.epoch, self.data_dir)
-        print 'Using epoch [%d]' % epoch
         return True
 
 
 # if __name__=='__main__':
+#   FOR DEBUG
 #   inter = NetInteractor()
 #   inter.load_model('dh28',40000,'28x28')
 #   inter.setup_panel()

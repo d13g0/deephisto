@@ -54,9 +54,8 @@ class Interpreter(cmd.Cmd):
         print
         print '   Animation:'
         print '   =========='
-        print '   anim [directory] [start] [stop]  [step]  : sets up an animation of the net through its epochs'
-        print '   next                        : next epoch   '
-        print '   play (loop)                 : plays animation'
+        print '   next                                     : next epoch   '
+        print '   play [directory] [start] [stop]  [step]  : sets up an animation of the net through its epochs'
         print
         print
         print '   Subject:'
@@ -76,7 +75,7 @@ class Interpreter(cmd.Cmd):
 
         dir = self.locations.PATCHES_DIR + '/' + self.data_dir
         if not os.path.exists(dir):
-            print '%s does not exist'
+            print Console.WARNING + '%s does not exist'%self.data_dir + Console.ENDC
             return
         dir = self.locations.PATCHES_DIR + '/' + self.data_dir
 
@@ -84,8 +83,14 @@ class Interpreter(cmd.Cmd):
             print '%s does not exist'
             return
 
-        print ' data dir set to ' + Console.BOLD +'%s' % self.data_dir + Console.ENDC
-        return
+        print 'data dir set to ' + Console.BOLD +'%s' % self.data_dir + Console.ENDC
+
+
+        train, test = self.obs.load_lists(data_dir=self.data_dir)
+        print
+        print 'size training set    :   %d'%len(train)
+        print 'size validation set  :   %d'%len(test)
+        print
 
     def do_load(self, args):
         """load [directory] [epoch] : loads a network with the given epoch data"""
@@ -134,6 +139,8 @@ class Interpreter(cmd.Cmd):
                 except Exception as e:
                     print e.message
                     return
+
+
         self.obs.setup_panel()
         self.do_rand(None)
 
@@ -145,8 +152,8 @@ class Interpreter(cmd.Cmd):
         obs.get_inputs()
         obs.get_predictions()
         obs.show_labels()
-        obs.show_predictions()
         plt.tight_layout()
+        obs.show_predictions()
         plt.draw()
 
     def do_epoch(self, args):
@@ -166,31 +173,6 @@ class Interpreter(cmd.Cmd):
         obs.get_predictions()
         obs.show_predictions()
 
-    def do_anim(self, args):
-        """sets up an animation of the net through its epoch
-        :param directory: the data directory
-        :param start: initial epoch
-        :param stop:  final epoch
-        :param step: animation step
-            """
-        if len(args.split()) != 4:
-            print 'Wrong number of parameters please check'
-            return
-
-        if self.data_dir == None:
-            print 'You need to set the data directory first with set_data [dir]'
-            return
-
-        directory, start, stop, step = args.split()
-        start = int(start)
-        stop = int(stop)
-        step = int(step)
-        obs = self.obs
-        obs.configure_sequence(directory, start, stop, step, self.data_dir)
-        obs.setup_panel()
-        obs.get_predictions()
-        obs.show_predictions()
-        plt.tight_layout()
 
     def do_next(self, args):
         """next: Shows the next epoch in the animation"""
@@ -201,19 +183,67 @@ class Interpreter(cmd.Cmd):
         plt.pause(0.000001)
 
     def do_play(self, args):
-        """play: Shows the animation. If the parameter loop is present, it loops back to the start when it finishes."""
-        if len(args) == 0:
-            loop = False
-        elif len(args) == 1 and args.trim().lower() == 'loop':
-            loop = True
-        obs = self.obs
-        obs.show_predictions()
-        plt.tight_layout()
+        """sets up an animation of the net through its epoch
+                :param directory: the data directory
+                :param start: initial epoch
+                :param stop:  final epoch
+                :param step: animation step
+        """
+        import matplotlib.animation as anim
 
-        while obs.next_epoch(loop):
-            obs.get_predictions()
-            obs.show_predictions()
-            plt.pause(0.00001)
+        if len(args.split()) != 4:
+            print 'Wrong number of parameters please check'
+            return
+
+        if self.data_dir == None:
+            print 'You need to set the data directory first with set_data [dir]'
+            return
+
+
+        obs = self.obs
+        directory, start, stop, step = args.split()
+        start = int(start)
+        stop = int(stop)
+        step = int(step)
+        if step < 0:
+            print '[step] cannot be a negative number'
+            return
+
+        if stop < start:
+            print '[stop] needs to be higher than [start]'
+            return
+
+
+        folder = self.locations.MOVIE_DIR + ('/%s_%d_%d_%d_%s'%(directory, start, stop, step, self.data_dir))
+        self.locations.check_dir_of(folder + '/dummy')
+
+        obs = self.obs
+        obs.verbose = False
+        obs.set_animation_params(directory, start, stop, step, self.data_dir)
+
+        plt.ion()
+        self.obs.setup_panel()
+        obs.get_inputs()
+        obs.show_labels()
+        plt.tight_layout()
+        flag_loop = True
+
+        steps = int((stop - start)/step)
+
+        L = steps-1
+
+        for i in range(steps):
+            print 'Frame %d from %d'%(i, L)
+            try:
+                obs.get_predictions()
+                obs.show_predictions()
+                plt.pause(0.000001)
+                plt.savefig(folder+'/frame%03d'%i, frameon=None, facecolor=obs.fig.get_facecolor(), edgecolor='none')
+                obs.next_epoch(False)
+            except KeyboardInterrupt:
+                pass
+
+        obs.verbose = True
         print 'DONE'
 
     def do_run(self, args):

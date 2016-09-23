@@ -1,11 +1,7 @@
-
-import matplotlib.pylab as plt
 import matplotlib.patches as ppa
-
-from deephisto import Locations
-from deephisto.image import ImageUtils
-from deephisto.patch import PatchSampler
-
+import matplotlib.pylab as plt
+from deephisto import Locations, PatchSampler
+from image import ImageUtils
 
 
 class PatchSamplingDemo:
@@ -78,5 +74,22 @@ class PatchSamplingDemo:
 if __name__=='__main__':
     locations = Locations('/home/dcantor/projects/deephisto')
     demo = PatchSamplingDemo(locations)
-    demo.configure('EPI_P036',7)
+
+    # sampler = PatchSampler(type=PatchSampler.TYPE_MONTECARLO,
+    #                        params=dict(coverage=0.8), callback = demo.show_rectangle)
+
+    # sampler = PatchSampler(type=PatchSampler.TYPE_CONVEX,
+    #                  params=dict(overlap_factor=2), callback=demo.show_rectangle)
+
+
+
+    sampler = PatchSampler(wsize=28,
+                           type=PatchSampler.TYPE_OVERLAP,
+                           params=dict(overlap_factor=4, edges=True, xcols=2, xrows=1),
+                           callback=demo.show_rectangle)
+
+
+    # sampler = PatchSampler(wsize=28, type=PatchSampler.TYPE_BACKGROUND,
+    #                        params=dict(overlap_factor=2, xmax=3, ymax=3), callback=demo.show_rectangle)
+    demo.configure('EPI_P046',6, sampler)
     demo.run()

@@ -4,7 +4,9 @@ Created on Thu Aug 25 15:28:53 2016
 
 @author: dcantor
 """
-import os
+import os, shutil
+
+from deephisto import Console
 
 class Locations:
     def __init__(self, root, subject=None):
@@ -28,6 +30,8 @@ class Locations:
         if self.ROOT_DIR[-1] != '/':
             self.ROOT_DIR = self.ROOT_DIR + '/'
 
+        self.MOVIE_DIR   = self.ROOT_DIR + 'movies'
+
         self.PATCHES_DIR = self.ROOT_DIR + 'patches'
         self.PATCH_TEMPLATE = self.PATCHES_DIR + '/%s/P_%s_%d_%s_%d_%d.png'  # subject-slice-type-x-y.png
 
@@ -50,23 +54,34 @@ class Locations:
         self.ROOT_DIR = root
         self.update()
 
-    def check_dir(self, path):
+    def check_dir_of(self, path):
         if not os.path.exists(os.path.dirname(path)):
-            print 'Creating directory %s' % os.path.dirname(path)
+            print Console.WARNING + 'Creating directory %s' % os.path.dirname(path) + Console.ENDC
             os.makedirs(os.path.dirname(path))
 
+    def create_empty_dir(self, path):
+        if not os.path.exists(path):
+            print Console.WARNING + 'Creating directory %s' % path + Console.ENDC
+            os.makedirs(path)
+        else:
+            print Console.WARNING + 'Clearing %s' % path + Console.ENDC
+            shutil.rmtree(path)
+            os.makedirs(path)
+
     def set_subject(self, subject):
-        self.SUBJECT_DIR = '/subjects/%s/' % subject
+        self.SUBJECT_DIR = '/subjects/%s' % subject
         self.subject = subject
         self.update()
 
     def get_mask_location(self, mask_index):
-        return self.MASK_DIR + 'A_S_%d_t_HI.png' % mask_index
+        return self.MASK_DIR + 'A_S_HI_%d.png' % mask_index
 
     def update(self):
 
         if self.ROOT_DIR[-1] != '/':
             self.ROOT_DIR = self.ROOT_DIR + '/'
+
+        self.MOVIE_DIR = self.ROOT_DIR + 'movies'
         # -----------------------------------------------------------------------------
         #   Location of the annotated images
         # -----------------------------------------------------------------------------
@@ -94,9 +109,9 @@ class Locations:
         #   Location of the resulting png images
         # -----------------------------------------------------------------------------
         self.IMAGES_DIR  = self.ROOT_DIR + self.SUBJECT_DIR + '/png/'
-        self.SOURCE_PNG  = self.IMAGES_DIR + 'S_%d_t_%s.png'
-        self.HISTO_PNG   = self.IMAGES_DIR + 'S_%d_t_HI.png'  # scaled histology used for annotations
-        self.HISTO_PNG_U = self.IMAGES_DIR + 'S_%d_t_HU.png'  #unscaled histology used for processing
+        self.SOURCE_PNG  = self.IMAGES_DIR + 'S_%s_%d.png'
+        self.HISTO_PNG   = self.IMAGES_DIR + 'S_HI_%d.png'  # scaled histology used for annotations
+        self.HISTO_PNG_U = self.IMAGES_DIR + 'S_HU_%d.png'  #unscaled histology used for processing
 
 
         # -----------------------------------------------------------------------------
