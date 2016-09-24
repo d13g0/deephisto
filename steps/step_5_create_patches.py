@@ -30,6 +30,7 @@ def dh_create_patches(target_dir, slices, locations):
     mcreator = PatchCreator(utils, msampler, target_dir)
     bcreator = PatchCreator(utils, bsampler, target_dir)
 
+    mcreator.clear_dir(True)
 
     for subject in sorted(slices):
         indices  = slices[subject]

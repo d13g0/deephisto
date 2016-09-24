@@ -10,7 +10,7 @@ from deephisto.utils import  Console
 
 class PatchCreator:
 
-    def __init__(self, utils, sampler,target_dir):
+    def __init__(self, utils, sampler,target_dir, cleardir=False):
         self.utils = utils
         self.subject = None
         self.index = None
@@ -18,7 +18,20 @@ class PatchCreator:
         self.sampler = sampler
         self.target_dir = target_dir
 
-    def create_patches(self, subject, index, cleardir=False): #,coverage=30):
+    def clear_dir(self, cleardir):
+
+        data_dir = utils.locations.PATCHES_DIR + '/' + self.target_dir
+        if not os.path.exists(data_dir):
+            os.makedirs(data_dir)
+            print 'Creating directory %s' % data_dir
+        else:
+            #  Empty directory first
+            if (cleardir):
+                print Console.WARNING + data_dir + ' exists. Emptying the patches directory [%s] before creating new patches' % self.target_dir + Console.ENDC
+                shutil.rmtree(data_dir)
+                os.makedirs(data_dir)
+
+    def create_patches(self, subject, index ): #,coverage=30):
         """
         :param subject:    The subject
         :param index:       The current slice
@@ -30,19 +43,6 @@ class PatchCreator:
         self.utils.set_subject(subject)
 
         utils = self.utils
-
-        data_dir = utils.locations.PATCHES_DIR + '/' + self.target_dir
-        if not os.path.exists(data_dir):
-            os.makedirs(data_dir)
-            print 'Creating directory %s'%data_dir
-        else:
-            #  Empty directory first
-            if (cleardir):
-                print Console.WARNING + data_dir + ' exists. Emptying the patches directory [%s] before creating new patches'%self.target_dir + Console.ENDC
-                shutil.rmtree(data_dir)
-                os.makedirs(data_dir)
-
-
 
         bmask = self.utils.get_binary_mask(index)
         self.sampler.set_mask(bmask)

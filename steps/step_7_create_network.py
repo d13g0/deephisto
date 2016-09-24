@@ -9,4 +9,4 @@ def dh_create_network(net_name, wsize, data_dir):
 
 if __name__ == '__main__':
     locations = Locations('/home/dcantor/projects/deephisto')
-    dh_create_network('dh28a', 28, '28x28a')
+    dh_create_network('dh28b', 28, '28x28b')
