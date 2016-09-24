@@ -31,7 +31,7 @@ class PatchSampler:
     TYPE_BACKGROUND = 'Background'
     TYPE_ALL = 'All'
 
-    def __init__(self, wsize=30, type=TYPE_ALL, mask=None, params=None, callback=None):
+    def __init__(self, wsize=28, type=TYPE_ALL, mask=None, params=None, callback=None):
 
         self.type = type
         self.params = params

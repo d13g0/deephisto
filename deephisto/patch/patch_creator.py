@@ -20,7 +20,7 @@ class PatchCreator:
 
     def clear_dir(self, cleardir):
 
-        data_dir = utils.locations.PATCHES_DIR + '/' + self.target_dir
+        data_dir = self.utils.locations.PATCHES_DIR + '/' + self.target_dir
         if not os.path.exists(data_dir):
             os.makedirs(data_dir)
             print 'Creating directory %s' % data_dir

@@ -19,7 +19,7 @@ def _get_slices(locations):
 
 def dh_create_patches(target_dir, slices, locations):
 
-    msampler = PatchSampler(type=PatchSampler.TYPE_MONTECARLO,
+    msampler = PatchSampler(wsize=28, type=PatchSampler.TYPE_MONTECARLO,
                            params=dict(coverage=0.8))
 
     bsampler = PatchSampler(wsize=28, type=PatchSampler.TYPE_BACKGROUND,
