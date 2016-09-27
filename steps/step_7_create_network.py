@@ -1,6 +1,6 @@
 import os
 os.environ['GLOG_minloglevel'] = '3'
-from deephisto import NetBuilder
+from deephisto import Locations, NetBuilder
 
 def dh_create_network(net_name, wsize, data_dir):
     nd = NetBuilder(net_name, wsize, data_dir=data_dir)
@@ -9,4 +9,4 @@ def dh_create_network(net_name, wsize, data_dir):
 
 if __name__ == '__main__':
     locations = Locations('/home/dcantor/projects/deephisto')
-    dh_create_network('dh28b', 28, '28x28b')
+    dh_create_network('dhloss', 28, '28x28b')

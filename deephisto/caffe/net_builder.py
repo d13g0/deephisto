@@ -1,7 +1,7 @@
 """
 Allows creating a network definition programatically.
 """
-import os
+import os, sys
 os.environ['GLOG_minloglevel'] = '3'
 
 import matplotlib.pylab as plt
@@ -17,6 +17,7 @@ from caffe.coord_map import crop
 from deephisto import PatchSampler, Console
 from CaffeLocations import CaffeLocations
 
+sys.path.insert(0, CaffeLocations.CAFFE_CODE_DIR)
 
 def conv_relu(bottom, nout, ks=3, stride=1, pad=1):
     conv = L.Convolution(bottom,
@@ -134,7 +135,11 @@ class NetBuilder:
         n.score = crop(n.deconv, n.data)
 
         if stage != CaffeLocations.STAGE_DEPLOY:
-            n.loss = L.SoftmaxWithLoss(n.score, n.label, loss_param=dict(normalize=False))  # , ignore_label=0
+            #n.loss = L.SoftmaxWithLoss(n.score, n.label, loss_param=dict(normalize=False))  # , ignore_label=0
+
+            n.loss = L.Python(n.score, n.label, module='LossLayer', layer='TopoLossLayer',
+                                       loss_weight=1)
+
 
         return n.to_proto()
 

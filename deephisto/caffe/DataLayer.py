@@ -46,8 +46,8 @@ class DataLayer(caffe.Layer):
         self.indices = open(datafile, 'r').read().splitlines()
         self.idx = 0
 
-        if self.stage != CaffeLocations.STAGE_TRAIN:
-            self.random = False
+        #if self.stage != CaffeLocations.STAGE_TRAIN:
+        #    self.random = False
 
         if self.random:
             random.seed(self.seed)
