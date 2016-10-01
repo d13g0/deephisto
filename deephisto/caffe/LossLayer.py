@@ -29,43 +29,34 @@ class TopoLossLayer(caffe.Layer):
         scores = inputs - np.max(inputs, axis=0)
         exp_scores = np.exp(scores)
 
-        if np.all(np.sum(exp_scores, axis=0, keepdims=True)) == 0:
-            print 'PROBLEM'
-            pdb.set_trace()
+        # if np.all(np.sum(exp_scores, axis=0, keepdims=True)) == 0:
+        #     print 'PROBLEM'
+        #     pdb.set_trace()
 
         probs = exp_scores / np.sum(exp_scores, axis=0, keepdims=True)
 
-        if not np.amax(probs) <= 1 or not np.amin(probs) >= 0:
-            print 'PROBLEM'
-            pdb.set_trace()
+        # if not np.amax(probs) <= 1 or not np.amin(probs) >= 0:
+        #     print 'PROBLEM'
+        #     pdb.set_trace()
 
         expected_value = np.zeros_like(pred, dtype=np.float32)
         for i in range(0, len(probs)):
             k = i
             expected_value += probs[i] * k
 
-        diff = np.exp(label) - np.exp(expected_value)
+        #diff = np.square(label) - np.square(expected_value)
+        diff = label - expected_value
 
-        loss = 0
-        _, h, w = probs.shape
-        for i in range(h):
-            for j in range(w):
-                idx = int(label[i, j])
-                loss += log_prob[idx, i, j]  # loss only sum the log_probs corresponding to the true classes
-
-        self.counter += 1
-
-        if self.counter == 100:
-            self._visualize(label, pred, diff)
-            titles = ['1. input', '2. scores', '3. exp_scores', '4. probability', '5.log prob']
-            steps = [inputs, scores, exp_scores, probs, log_prob]
-            self._show_channels(steps, titles)
-            plt.show()
-            self.counter = 0
-
-        self.probs = probs
-        self.loss = loss
         self.label = label
+        self.pred = pred
+        self.diff = diff
+        self.inputs = inputs
+        self.scores = scores
+        self.exp_scores = exp_scores
+        self.probs = probs
+        self.expected_value = expected_value
+        self.loss = np.sum(diff**2)
+
         top[0].data[...] = self.loss
 
     def backward(self, top, propagate_down, bottom):
@@ -75,22 +66,47 @@ class TopoLossLayer(caffe.Layer):
         """
         assert propagate_down[1] != True, 'gradients cannot be calculated with respect to the label inputs'
 
-        loss = self.loss
-        grad = self.probs
-        label = self.label
-
-        _, h, w = grad.shape
-        for i in range(h):
-            for j in range(w):
-                idx = int(label[i, j])
-                grad[idx, i, j] = (grad[idx, i, j] - 1) / loss
-
-        # assert np.any(np.max(np.abs(self.grad))) <=  math.exp(10), 'numeric problem'
-
-        print 'loss %.2f  min: %f max: %f' % (self.loss, grad.min(), grad.max())
-
         if propagate_down[0]:
-            bottom[0].diff[0, ...] = grad
+
+            label = self.label
+            pred  = self.pred
+            diff = self.diff
+            inputs = self.inputs
+            scores = self.scores
+            exp_scores = self.exp_scores
+            probs = self.probs
+            b     = self.expected_value
+            loss  = self.loss
+
+
+            _,N,_,_ = bottom[0].shape  #number of input maps == number of classes
+
+            for i in range(N):   #for each input map
+                sum = 0
+                for j in range(N):
+                    if (i==j):
+                        sum += j*probs[j]*(1-probs[j])
+                    else:
+                        sum += -j*probs[i]*probs[j]
+
+                diff_Li = -diff * b * sum /10
+                bottom[0].diff[0,i,...]  = diff_Li
+
+            # grad = bottom[0].diff
+            # self.counter += 1
+            # if self.counter % 500 == 0:
+            #     print 'loss %.2f  min: %f max: %f' % (loss, grad.min(), grad.max())
+            #
+            # if self.counter == 2000:
+            #
+            #     self._visualize(label, pred, diff)
+            #     grads = grad[0,...]
+            #     titles = ['1. input', '2. scores', '3. exp','4.prob','5.grad']
+            #     steps = [inputs, scores, exp_scores,probs,grads]
+            #     self._show_channels(steps, titles)
+            #     plt.show()
+            #     self.counter = 0
+
 
     def _visualize(self, label, pred, diff):
 
@@ -116,7 +132,7 @@ class TopoLossLayer(caffe.Layer):
 
         plt.tight_layout()
 
-    def _show(self, title, image, use_label_range=True):
+    def _show(self, image, title, use_label_range=True):
         fig = plt.figure()
         fig.canvas.set_window_title(title)
         if use_label_range:
@@ -139,7 +155,7 @@ class TopoLossLayer(caffe.Layer):
             ax[i, 0].set_ylabel(titles[i], rotation=90, size='large', color='#cccccc')
             for j in range(C):
                 ax[i, j].set_axis_bgcolor('black')
-                ax[i, j].imshow(step[j], interpolation='none', vmin=step[j].min(), vmax=step[j].max(), cmap='hot')
+                ax[i, j].imshow(step[j], interpolation='none', vmin=step[j].min(), vmax=step[j].max(), cmap='bone')
                 ax[i, j].get_xaxis().set_visible(False)
                 ax[i, j].get_yaxis().set_ticks([])
                 ax[i, j].format_coord = self._get_formatter('%s - Channel [%d]' % (titles[i], j), step[j])
@@ -158,8 +174,8 @@ class TopoLossLayer(caffe.Layer):
             if col >= 0 and col < numcols and row >= 0 and row < numrows:
                 z = img[col, row]
 
-                return '%s x,y: %d,%d, value: %.2f' % (title, col, row, z)
+                return '%s x,y: (%d, %d)  value: %.5f' % (title, col, row, z)
             else:
-                return '%s x,y: %d,%d' % (title, col, row)
+                return '%s x,y: (%d, %d)' % (title, col, row)
 
         return formatter

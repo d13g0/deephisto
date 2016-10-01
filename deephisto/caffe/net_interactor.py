@@ -249,9 +249,6 @@ class NetInteractor:
             ax[i, j].get_xaxis().set_visible(False)
             ax[i, j].get_yaxis().set_visible(False)
             ax[i, j].set_axis_bgcolor('black')
-            # ax[i, j].spines['top'].set_visible(False)
-            # ax[i, j].spines['right'].set_visible(False)
-            # ax[i, j].spines['bottom'].set_visible(False)
         plt.subplots_adjust(top=0.9, left=0, bottom=0, right=1, wspace=0, hspace=0)
         plt.draw()
         self.fig = fig
@@ -291,6 +288,7 @@ class NetInteractor:
             pred = self.predictions[k]
             self.ax[i, 2 * j + 1].imshow(pred, interpolation='None', cmap='jet', vmin=0,
                                          vmax=CaffeLocations.NUM_LABELS)
+            self.ax[i, 2 * j + 1].format_coord = self._get_formatter('Prediction: value %d', pred)
         plt.subplots_adjust(top=0.9, left=0, bottom=0, right=1, wspace=0, hspace=0)
         plt.draw()
 
