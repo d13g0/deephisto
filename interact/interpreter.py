@@ -60,10 +60,10 @@ class Interpreter(cmd.Cmd):
         print
         print '   Subject:'
         print '   ========'
-        print '   run [subject] [slice] [window]  : runs the network on this slice patcy-by-patch'
+        print '   run [subject] [slice] [avg|max|med|mod] : runs the network on this slice patcy-by-patch'
         print
-        print '   man                             : shows this message                          '
-        print '   exit                            : exits the interpreter'
+        print '   man                                     : shows this message                          '
+        print '   exit                                    : exits the interpreter'
         print '------------------------------------------------------------------------------'
 
     def do_data(self, args):
@@ -248,19 +248,21 @@ class Interpreter(cmd.Cmd):
 
     def do_run(self, args):
         if (len(args.split()) != 3):
-            print 'Error: run [subject] [slice] [wsize]'
+            print 'Error: run [subject] [slice] [avg|max|med|mod]'
             return
-        subject, slice, wsize = args.split()
+        subject, slice, blend = args.split()
         slice = int(slice)
-        wsize = int(wsize)
+
         try:
             self.net_test.load_data(subject, slice)
-        except ValueError as e:
+            self.net_test.load_network(self.obs.directory, self.obs.epoch, self.data_dir)
+            self.net_test.set_window(28)  #hard code. Patches are 28x28
+            self.net_test.set_blend(blend)
+            self.net_test.go()
+        except (ValueError, AssertionError) as e:
             print e
             return
-        self.net_test.load_network(self.obs.directory, self.obs.epoch, self.data_dir)
-        self.net_test.set_window(wsize)
-        self.net_test.go()
+
 
     def do_pipe(self, args):
         for arg in args:

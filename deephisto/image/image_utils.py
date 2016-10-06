@@ -120,14 +120,14 @@ class ImageUtils:
         min = 10000000
         for idx in indices:
             data = self.load_unscaled_histo_png_image(idx)
-            print data.min(), data.max()
+            print "[%d] min: %.2f,  max: %.2f"%(idx, data.min(), data.max())
             if data.min() < min:
                 min = data.min()
 
             if data.max() > max:
                 max = data.max()
 
-        print 'Dynamic Range:  (%d, %d)'%(min,max)
+        print 'Dynamic Range:  %.2f to %.2f'%(min,max)
 
         return min, max
 

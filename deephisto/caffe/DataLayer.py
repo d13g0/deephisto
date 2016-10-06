@@ -8,8 +8,6 @@ from CaffeLocations import CaffeLocations
 # Making sure that this file is visible to caffe
 sys.path.insert(0, CaffeLocations.CAFFE_CODE_DIR)
 
-ROTATIONS = [0, 180]
-
 
 class DataLayer(caffe.Layer):
     """
@@ -34,8 +32,6 @@ class DataLayer(caffe.Layer):
 
         self.random = params.get('random', True)
         self.seed = params.get('seed', None)
-
-        self.data_augmentation = params.get('data_augmentation', False)
         self.angle = 0
 
         avg_img_file = self.split_dir + '/' + CaffeLocations.AVG_IMG
@@ -46,8 +42,8 @@ class DataLayer(caffe.Layer):
         self.indices = open(datafile, 'r').read().splitlines()
         self.idx = 0
 
-        #if self.stage != CaffeLocations.STAGE_TRAIN:
-        #    self.random = False
+        if self.stage != CaffeLocations.STAGE_TRAIN:
+            self.random = False
 
         if self.random:
             random.seed(self.seed)
@@ -56,7 +52,6 @@ class DataLayer(caffe.Layer):
         print
         print 'Data Layer setup'
         print '-------------------------------------------------'
-        print 'Data augmentation : %s' % self.data_augmentation
         print 'Random  selection : %s' % self.random
         print 'Stage             : %s' % self.stage
         print '-------------------------------------------------'
@@ -86,22 +81,14 @@ class DataLayer(caffe.Layer):
                 print  '-------------------------------------'
                 self.idx = 0
 
-                # if self.data_augmentation:
-                #     self.angle = ROTATIONS[random.randint(0, len(ROTATIONS) - 1)]
+        #self.idx = 1251
 
     def backward(self, top, propagate_down, bottom):
         pass
 
     def load_image(self, filename):
-        # print filename
         img = Image.open('%s/%s' % (self.data_dir, filename))
-        ## -----------------------
-        # if self.data_augmentation:
-        #     rotated = img.rotate(self.angle)
-        #     img = np.array(img, dtype=np.float32)
-        ## -----------------------
         img = np.array(img, dtype=np.float32)
-        # pdb.set_trace()
         img -= self.mean  # subtract mean value
         img = img[:, :, ::-1]  # switch channels RGB -> BGR
         img = img.transpose((2, 0, 1))  # transpose to channel x height x width
@@ -113,17 +100,7 @@ class DataLayer(caffe.Layer):
         The leading singleton dimension is required by the loss.
         """
         img = Image.open('%s/%s' % (self.data_dir, filename))
-
-        ## -----------------------
-        # if self.data_augmentation:
-        #     img = np.array(img.rotate(self.angle), dtype=np.float32)
-        ## -----------------------
-
         label = np.array(img, dtype=np.uint8)
         label = label[:, :, 0]  # take any channel (flatten png to grayscale image)
-
-        # label[(label < 1)] = 0
-        # label[(label >= 1)] = 5  # surgery
-
         label = label[np.newaxis, ...]  # add the batch dimension
         return label

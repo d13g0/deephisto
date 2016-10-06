@@ -224,15 +224,14 @@ class NetInteractor:
             label = self.labels[k]
             net.blobs['data'].data[...] = input
             net.forward()
-            pred = net.blobs['score'].data
-            pred = pred[0, ...]
+            pred = net.blobs['score'].data[0,...]
             pred = pred.argmax(axis=0)
             self.predictions.append(pred)
 
     def setup_panel(self):
         ROWS = self.PANEL_ROWS
         COLS = self.PANEL_COLS
-
+        plt.ion()
         fig, ax = plt.subplots(ROWS, COLS * 2,  squeeze=False, facecolor='black', figsize=(12,8))
         fig.canvas.set_window_title('DeepHisto Training [dir: %s, epoch: %d]' % (self.directory, self.epoch))
         fig.suptitle('DeepHisto Training [dir: %s, epoch: %d]' % (self.directory, self.epoch))
@@ -292,6 +291,12 @@ class NetInteractor:
         plt.subplots_adjust(top=0.9, left=0, bottom=0, right=1, wspace=0, hspace=0)
         plt.draw()
 
+    def expected_value(self, pred):
+        e_value = np.zeros_like(pred[0,...], dtype=np.float32)
+        for i in range(len(pred)):
+            e_value += pred[i] * i
+        return e_value
+
     def get_single_prediction(self, patch_name=None):
         net = self.net
         image_file, label_file = self.get_files(patch_name=patch_name)
@@ -300,7 +305,6 @@ class NetInteractor:
         net.forward()
         pred = net.blobs['score'].data
         pred = pred[0, ...]
-
         N,_,_ = pred.shape
         channels = []
         for i in range(N):
@@ -384,13 +388,3 @@ class NetInteractor:
         return True
 
 
-# if __name__=='__main__':
-#   FOR DEBUG
-#   inter = NetInteractor()
-#   inter.load_model('dh28',40000,'28x28')
-#   inter.setup_panel()
-#   inter.get_inputs()
-#   inter.get_predictions()
-#   inter.show_labels()
-#   inter.show_predictions()
-#   plt.show()

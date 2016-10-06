@@ -131,7 +131,7 @@ class Visualizer:
         v y (h)
     """
 
-    def __init__(self, locations, wsize=30):
+    def __init__(self, locations, wsize=28):
 
         print ' Patch Visualizer'
         print '---------------------------------------\n'
