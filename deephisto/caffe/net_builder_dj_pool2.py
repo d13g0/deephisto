@@ -70,7 +70,6 @@ class NetBuilderDeepJet_pool2:
             source_params = dict(stage=stage)
             source_params['data_dir'] = self.DATA_DIR
             source_params['split_dir'] = self.SPLIT_DIR
-            source_params['data_augmentation'] = False
             n.data, n.label = L.Python(module='DataLayer',
                                        layer='DataLayer',
                                        ntop=2,

@@ -39,7 +39,8 @@ class PatchSamplingDemo:
         rect = ppa.Rectangle((y - WSIDE, x - WSIDE), WSIZE, WSIZE,
                              linewidth=1, edgecolor='r', facecolor='r', alpha=0.2)
         self.ax.add_patch(rect)
-        plt.pause(0.001)
+        plt.pause(0.1)
+
 
     def run(self):
         """
@@ -83,13 +84,14 @@ if __name__=='__main__':
 
 
 
-    sampler = PatchSampler(wsize=28,
-                           type=PatchSampler.TYPE_OVERLAP,
-                           params=dict(overlap_factor=4, edges=True, xcols=2, xrows=1),
-                           callback=demo.show_rectangle)
+    # sampler = PatchSampler(wsize=28,
+    #                        type=PatchSampler.TYPE_OVERLAP,
+    #                        params=dict(overlap_factor=4, edges=True, xcols=2, xrows=1),
+    #                        callback=demo.show_rectangle)
 
 
-    # sampler = PatchSampler(wsize=28, type=PatchSampler.TYPE_BACKGROUND,
-    #                        params=dict(overlap_factor=2, xmax=3, ymax=3), callback=demo.show_rectangle)
-    demo.configure('EPI_P046',6, sampler)
+    sampler = PatchSampler(wsize=28, type=PatchSampler.TYPE_BACKGROUND,
+                            params=dict(overlap_factor=2, xmax=3, ymax=3), callback=demo.show_rectangle)
+
+    demo.configure('EPI_P036',3, sampler)
     demo.run()

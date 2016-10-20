@@ -14,12 +14,13 @@ from deephisto.caffe import CaffeLocations
 
 class NetTest:
 
-    BLEND_AVERAGE = 'avg'
+    BLEND_MEAN = 'avg'
     BLEND_MAX = 'max'
     BLEND_MEDIAN = 'med'
     BLEND_MODE  = 'mod'
+    BLEND_MODE_MAX = 'mod+max'
 
-    BLEND_MODES = [BLEND_AVERAGE, BLEND_MAX, BLEND_MEDIAN, BLEND_MODE]
+    BLEND_MODES = [BLEND_MEAN, BLEND_MAX, BLEND_MEDIAN, BLEND_MODE, BLEND_MODE_MAX ]
 
 
     def __init__(self, locations):
@@ -28,7 +29,7 @@ class NetTest:
         self.subject = None
         self.index = None
         self.WSIZE = None
-        self.BMODE = NetTest.BLEND_AVERAGE
+        self.BMODE = NetTest.BLEND_MEAN
 
     def set_window(self, wsize):
 
@@ -102,10 +103,12 @@ class NetTest:
         ax[1].set_axis_bgcolor('black')
         ax[1].set_title('ground truth', color='white')
         ax[1].imshow(self.hist_flat, vmin=0, vmax=10, cmap='jet', interpolation='None')
+        ax[1].format_coord = self._get_formatter('Ground Truth', self.hist_flat)
 
         ax[2].set_axis_bgcolor('black')
         ax[2].set_title('prediction', color='white')
         self.plot_img = ax[2].imshow(np.zeros(shape=self.mask.shape), interpolation='None', cmap='jet', vmin=0, vmax=10)
+
 
         self.rect = ppa.Rectangle((0, 0), self.WSIZE, self.WSIZE, linewidth=1, edgecolor='#ff0000', facecolor='none', alpha=0.5)
         ax[2].add_patch(self.rect)
@@ -178,7 +181,7 @@ class NetTest:
 
         assert base.shape == pred.shape
 
-        if self.BMODE == NetTest.BLEND_AVERAGE:
+        if self.BMODE == NetTest.BLEND_MEAN:
             return np.mean([base, pred], axis=0)
 
         elif self.BMODE == NetTest.BLEND_MAX:
@@ -221,7 +224,7 @@ class NetTest:
         h,w = image_pass.shape
         passes = np.zeros(shape=(STEPS, h,w))
 
-
+        idx = 0
         for offset in range(STEPS):
 
             self.new_pass()
@@ -231,6 +234,8 @@ class NetTest:
 
             y = offset*STEP
             x = offset*STEP
+
+
 
             while (y <= MAX_Y):
                 while (x < MAX_X):
@@ -245,10 +250,13 @@ class NetTest:
                 self.rect.set_x(x - self.WSIDE)
                 self.rect.set_y(y - self.WSIDE)
                 plt.pause(0.001)
+                # plt.savefig('pass_%03d.png' % idx)
+                # idx +=1
                 x = offset*STEP
                 y +=  self.WSIZE
 
-                passes[offset] = np.array(self.target, dtype=np.float)
+            passes[offset] = np.array(self.target, dtype=np.float)
+
 
         plt.show(block=False)
 
@@ -258,42 +266,76 @@ class NetTest:
         mode = stats.mode(passes, axis=0)[0][0]
         maximum = np.max(passes, axis=0)
         mean = np.mean(passes, axis=0)
+        blend = np.copy(mode)
+        blend[np.where(maximum >= 5)] = maximum[np.where(maximum >= 5)]
 
 
         if self.BMODE == NetTest.BLEND_MEDIAN:
             self.plot_img.set_data(median)
+            self.ax[2].format_coord = self._get_formatter('Median',median)
+            self.ax[2].set_title('Median', color='white')
         elif self.BMODE == NetTest.BLEND_MODE:
             self.plot_img.set_data(mode)
+            self.ax[2].format_coord = self._get_formatter('Mode', mode)
+            self.ax[2].set_title('Mode', color='white')
         elif self.BMODE == NetTest.BLEND_MAX:
             self.plot_img.set_data(maximum)
-        elif self.BMODE == NetTest.BLEND_AVERAGE:
+            self.ax[2].format_coord = self._get_formatter('Max', maximum)
+            self.ax[2].set_title('Max', color='white')
+        elif self.BMODE == NetTest.BLEND_MEAN:
             self.plot_img.set_data(mean)
+            self.ax[2].format_coord = self._get_formatter('Mean', mean)
+            self.ax[2].set_title('Mean', color='white')
+        elif self.BMODE == NetTest.BLEND_MODE_MAX:
+            self.plot_img.set_data(blend)
+            self.ax[2].format_coord = self._get_formatter('Mode+Max', blend)
+            self.ax[2].set_title('Mode + Max', color='white')
+
 
         plt.pause(0.001)
 
 
-        fig, ax = plt.subplots(1,5,figsize=(12,3),sharex=True, sharey=True,facecolor='black')
+        fig, ax = plt.subplots(1,6,figsize=(12,3),sharex=True, sharey=True,facecolor='black')
         fig.canvas.set_window_title('%s - %d Subject: %s  [%s]' % (self.directory, self.epoch, self.subject, self.index))
-        titles = ['ground truth','median','mode','max','average']
-        images = [self.hist_flat,median,mode,maximum,mean]
+        titles = ['Ground Truth','Median','Mode','Max','Mean','Mode + Max']
+        images = [self.hist_flat,median,mode,maximum,mean, blend]
 
-        for i in range(5):
+        for i in range(6):
             ax[i].get_xaxis().set_visible(False)
             ax[i].get_yaxis().set_visible(False)
             ax[i].set_axis_bgcolor('black')
             ax[i].imshow(images[i], interpolation='None', cmap='jet', vmin=0, vmax=10)
-            ax[i].set_title(titles[i],color='white')
+            ax[i].set_title(titles[i],color='white', fontsize=16)
+            ax[i].format_coord = self._get_formatter(titles[i], images[i])
 
         plt.tight_layout()
         plt.subplots_adjust(left=0, bottom=0, right=1, wspace=0, hspace=0)
         plt.pause(0.001)
 
 
+    def _get_formatter(self, title, img):
+
+        img = img
+
+        def formatter(x, y):
+            numcols, numrows = img.shape
+            row = int(x + 0.5)
+            col = int(y + 0.5)
+            if col >= 0 and col < numcols and row >= 0 and row < numrows:
+                z = img[col, row]
+
+                return '%s x,y: %d,%d, value: %.2f' % (title, col, row, z)
+            else:
+                return '%s x,y: %d,%d' % (title, col, row)
+
+        return formatter
+
+
 if __name__ == '__main__':
     pr = NetTest(Locations('/home/dcantor/projects/deephisto'))
     pr.set_window(28)
-    pr.load_network('dhjet', 700000, '28x28b')
-    pr.load_data('EPI_P036', 3)
+    pr.load_network('fcn8', 590000, '28x28b')
+    pr.load_data('EPI_P040', 4)
     pr.set_window(28)
     pr.set_blend(NetTest.BLEND_MAX)
     pr.go()

@@ -1,9 +1,10 @@
-import csv, glob, os.path
+import csv, glob, os.path, pdb
 
 import matplotlib.pylab as plt
 import numpy as np
 from PIL import Image
-from sklearn.cross_validation import  ShuffleSplit
+#from sklearn.cross_validation import  ShuffleSplit
+from random import shuffle
 
 from deephisto.utils.console import Console
 
@@ -33,6 +34,9 @@ class DatasetCreator:
 
 
         sources = [os.path.basename(f) for f in files if '_MU_' in f]
+        L = len(sources)
+        print
+        print 'Input size               : '+ Console.OKBLUE + '%d'%L + Console.ENDC
         targets = []
 
         if len(sources) == 0:
@@ -58,26 +62,122 @@ class DatasetCreator:
                 return
 
 
-        # this is why I love python (well, one of the reasons...)
         map = zip(sources,targets)
+
+        #separate training and validation sets
+
+        slides = {}
+
+        for input, label in map:
+
+            key = '_'.join(input.split('_')[0:4])
+            if not key in slides:
+                slides[key] = [(input,label)]
+            else:
+                slides[key].append((input,label))
+
+        keys = slides.keys()
+        M = len(keys)
+        keys.sort()
+
+        # print
+        # print 'Totals'
+        # for key in keys:
+        #     print key, len(slides[key])
+
+        shuffle(keys)
+        shuffle(keys)
+        shuffle(keys)
+
+        threshold = int(L  * self.training)
+
+        sum = 0
+        training_patches = []
+        validation_patches = []
         idx = 0
-        N = len(map)
-        train_indices = None
-        validation_indices = None
-        print 'Number of elements       : %d'%N
 
-        split = ShuffleSplit(N,1, train_size=self.training, test_size=None)
-        for a, b in split:
-            train_indices = a
-            validation_indices = b
+        print 'Training patches'
+        print '----------------'
+        while sum < threshold:
+            key = keys[idx]
+            training_patches += slides[key]
+            sum += len(slides[key])
+            print key, len(slides[key])
+            idx +=1
+        print
+        print 'Total : %d'%sum
+
 
         print
-        print 'Database size            : %s'% (Console.BOLD + Console.OKBLUE + str(N) + Console.ENDC)
-        print 'Training dataset size    : %s'%Console.OKBLUE + str(len(train_indices)) + Console.ENDC
-        print 'Validation dataset size  : %s'%Console.OKBLUE + str(len(validation_indices)) + Console.ENDC
+        print 'Validation patches'
+        print '------------------'
+        sum = 0
+        for j in range(idx, M):
+            key = keys[j]
+            validation_patches += slides[key]
+            sum += len(slides[key])
+            print key, len(slides[key])
+
+        print 'Total : %d' % sum
+
+
+
+        assert len(training_patches) + len(validation_patches) == L, 'The dataset was not splitted adequately'
+
+        print
+        print 'Database size            : %s'% (Console.BOLD + Console.OKBLUE + str(L) + Console.ENDC)
+        print 'Estimated training size  : ' + Console.BOLD + '%d' % threshold + Console.ENDC
+        print 'Training dataset size    : %s'%Console.OKBLUE + str(len(training_patches)) + Console.ENDC
+        print 'Validation dataset size  : %s'%Console.OKBLUE + str(len(validation_patches)) + Console.ENDC
         print
 
-        assert len(train_indices) + len(validation_indices) == N, "The dataset was not splitted adequately"
+
+
+        # idx = 0
+        # N = len(map)
+        # train_indices = None
+        # validation_indices = None
+        # print 'Number of elements       : %d'%N
+        #
+        # split = ShuffleSplit(N,1, train_size=self.training, test_size=None)
+        # for a, b in split:
+        #     train_indices = a
+        #     validation_indices = b
+
+        # print
+        # print 'Database size            : %s'% (Console.BOLD + Console.OKBLUE + str(N) + Console.ENDC)
+        # print 'Training dataset size    : %s'%Console.OKBLUE + str(len(train_indices)) + Console.ENDC
+        # print 'Validation dataset size  : %s'%Console.OKBLUE + str(len(validation_indices)) + Console.ENDC
+        # print
+        #
+        # assert len(train_indices) + len(validation_indices) == N, "The dataset was not splitted adequately"
+        #
+        # training_txt = self.locations.TRAINING_TXT%DS_DIR
+        #
+        # self.locations.check_dir_of(training_txt)
+        #
+        # with open(training_txt,'wb') as training_file:
+        #     writer = csv.writer(training_file, delimiter=';')
+        #     for idx in train_indices:
+        #         writer.writerow([map[idx][0], map[idx][1]])
+        #
+        # print training_txt + ' has been written'
+        #
+        #
+        # validation_txt = self.locations.VALIDATION_TXT%DS_DIR
+        # with open(validation_txt,'wb') as validation_file:
+        #     writer = csv.writer(validation_file, delimiter=';')
+        #     for idx in validation_indices:
+        #         writer.writerow([map[idx][0], map[idx][1]])
+        #
+        # print validation_txt + ' has been written'
+        # print
+
+        self._write_files(training_patches, validation_patches, DS_DIR)
+
+        self._compute_average(DS_DIR)
+
+    def _write_files(self, training_patches, validation_patches, DS_DIR):
 
         training_txt = self.locations.TRAINING_TXT%DS_DIR
 
@@ -85,8 +185,8 @@ class DatasetCreator:
 
         with open(training_txt,'wb') as training_file:
             writer = csv.writer(training_file, delimiter=';')
-            for idx in train_indices:
-                writer.writerow([map[idx][0], map[idx][1]])
+            for idx in training_patches:
+                writer.writerow([idx[0], idx[1]])
 
         print training_txt + ' has been written'
 
@@ -94,13 +194,11 @@ class DatasetCreator:
         validation_txt = self.locations.VALIDATION_TXT%DS_DIR
         with open(validation_txt,'wb') as validation_file:
             writer = csv.writer(validation_file, delimiter=';')
-            for idx in validation_indices:
-                writer.writerow([map[idx][0], map[idx][1]])
+            for idx in validation_patches:
+                writer.writerow([idx[0], idx[1]])
 
         print validation_txt + ' has been written'
         print
-
-        self._compute_average(DS_DIR)
 
     def _compute_average(self, DS_DIR):
 

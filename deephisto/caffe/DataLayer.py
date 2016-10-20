@@ -81,7 +81,7 @@ class DataLayer(caffe.Layer):
                 print  '-------------------------------------'
                 self.idx = 0
 
-        #self.idx = 1251
+        #self.idx = 1251 #testing the loss layer
 
     def backward(self, top, propagate_down, bottom):
         pass
