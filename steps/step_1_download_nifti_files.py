@@ -1,6 +1,17 @@
 from subjects import dh_load_subjects
 from deephisto import ImageRetriever, Locations
 
+"""
+This is the first step you need to run on your DeepHisto project. Please configure the paths
+according to your installation. In this example, I have mounted the remote directories on /home/dcantor/remote
+
+
+Also, this example shows two dictionaries: sources and targets. Make sure that both have the same keys. Copying
+from the remote location to the local one is one-to-one based on these keys. Also if you are including other images
+in your experiment you can expand/modify this dictionary. For example, if you had more source images other than
+FA, MD and MR, you could create the corresponding keys in the source and target dictionaries to add them.
+
+"""
 
 def dh_download_nifti_files(subjects, loc):
     """

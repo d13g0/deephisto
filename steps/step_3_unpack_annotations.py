@@ -19,8 +19,17 @@ def dh_unpack_annotations(subjects, locations):
         utils.set_subject(s)
         utils.unpack_annotations()
 
+def dh_get_histo_range(subjects, locations):
+    utils = ImageUtils(locations)
+    for s in subjects:
+        print
+        print s
+        print '---------------------------------'
+        utils.set_subject(s)
+        utils.get_dynrange_histo()
 
 if __name__=='__main__':
     locations = Locations('/home/dcantor/projects/deephisto')
     subjects = dh_load_subjects()
     dh_unpack_annotations(subjects, locations)
+    dh_get_histo_range(subjects, locations)
