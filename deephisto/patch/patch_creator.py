@@ -4,7 +4,6 @@ import shutil
 import Image
 import numpy as np
 
-from deephisto.patch import PatchSampler
 from deephisto.utils import  Console
 
 

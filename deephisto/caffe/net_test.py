@@ -102,12 +102,12 @@ class NetTest:
 
         ax[1].set_axis_bgcolor('black')
         ax[1].set_title('ground truth', color='white')
-        ax[1].imshow(self.hist_flat, vmin=0, vmax=10, cmap='jet', interpolation='None')
+        ax[1].imshow(self.hist_flat, cmap='jet', interpolation='None',vmin=0, vmax=CaffeLocations.NUM_LABELS )
         ax[1].format_coord = self._get_formatter('Ground Truth', self.hist_flat)
 
         ax[2].set_axis_bgcolor('black')
         ax[2].set_title('prediction', color='white')
-        self.plot_img = ax[2].imshow(np.zeros(shape=self.mask.shape), interpolation='None', cmap='jet', vmin=0, vmax=10)
+        self.plot_img = ax[2].imshow(np.zeros(shape=self.mask.shape), interpolation='None', cmap='jet', vmin=0, vmax=CaffeLocations.NUM_LABELS)
 
 
         self.rect = ppa.Rectangle((0, 0), self.WSIZE, self.WSIZE, linewidth=1, edgecolor='#ff0000', facecolor='none', alpha=0.5)
@@ -121,7 +121,7 @@ class NetTest:
 
     def new_pass(self):
         self.target = Image.fromarray(np.zeros(shape=self.mask.shape[0:2]))
-        self.plot_img = self.ax[2].imshow(np.zeros(shape=self.mask.shape), interpolation='None', cmap='jet', vmin=0, vmax=10)
+        self.plot_img = self.ax[2].imshow(np.zeros(shape=self.mask.shape), interpolation='None', cmap='jet', vmin=0, vmax=CaffeLocations.NUM_LABELS)
 
     def update_pass(self, x, y, data):
 

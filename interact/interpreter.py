@@ -36,7 +36,7 @@ class Interpreter(cmd.Cmd):
         print
         print ' Commands: '
         print
-        print '   data  [dir]                 : sets the data directory '
+        print '   data  [dir]                 : sets the data directory (where patches are)'
         print
         print '   Single patch:'
         print '   ============='
