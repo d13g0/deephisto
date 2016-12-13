@@ -1,9 +1,11 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Aug 25 15:35:15 2016
+#  This file makes part of DEEP HISTO
+#
+#  Deep Histo is a medical imaging project that uses deep learning to
+#  predict histological features from MRI.
+#
+#  Author: Diego Cantor
+#  Created on Thu Aug 25 15:35:15 2016
 
-@author: dcantor
-"""
 
 import matplotlib as mpl
 import numpy as np
@@ -16,11 +18,10 @@ from matplotlib import gridspec
 import Image
 import Tkinter as Tk
 
-from locations import Locations
 from image import ImageUtils
-from patch import PatchSampler
 from utils import DraggableRectangle
 
+from deephisto import Locations
 
 
 class SliceButtonCallback(object):
@@ -40,26 +41,24 @@ class ImageSetHelper:
     def load(self, utils, indices):
 
         self.mask_set = []
-        self.image_set = []
-        self.histo_set = []  # contains the real intensities
+        self.sources_set = []
+        self.label_set = []  # contains the real intensities
         self.pimage_set = []  # used for cropping with PIL
 
         print 'Loading Image Set'
-        for i in indices:
-            print 'Slice [%d]' % i
-            mask = utils.load_mask_png(i)
-            images = utils.load_source_png_images(i)
-            histo = utils.load_unscaled_histo_png_image(i)
-
-            pimages = []
+        for index in indices:
+            mask = utils.load_mask_for_slice(index)
+            sources = utils.load_sources_for_slice(index)
+            label = utils.load_labels_for_slice(index)
 
             self.mask_set.append(mask)
-            self.image_set.append(images)
-            self.histo_set.append(histo)
+            self.sources_set.append(sources)
+            self.label_set.append(label)
 
-            for j in images:
+            pimages = []
+            for j in sources:
                 pimages.append(Image.fromarray(j))
-            pimages.append(Image.fromarray(histo))
+            pimages.append(Image.fromarray(label))
 
             self.pimage_set.append(pimages)
 
@@ -131,32 +130,56 @@ class Visualizer:
         v y (h)
     """
 
-    def __init__(self, locations, wsize=28):
+    def __init__(self, config):
+        """
+        Initializes the visualizer and its helper objects
+        """
 
-        print ' Patch Visualizer'
-        print '---------------------------------------\n'
+
+        self.config = config
+        self.colormap = config.visualizer.COLORMAP
         self.fig = None
         self.pimages = []
         self.drs = []
         self.axs = []
         self.bxs = []
+
+        # mapping to label range
         self.vmin = 0
-        self.vmax = 255
-        self.utils = ImageUtils(locations)
-        self.image_helper = ImageSetHelper()
+        self.vmax = config.NUM_LABELS-1
+
         self._go_dialog = GoToDialog(self)
         self._picker = None
-        if locations.subject is not None:
-            self.set_subject(locations.subject)
 
-        self.WSIZE = wsize
-        if self.WSIZE %2 !=0:
+        # configuring window size
+        self.WSIZE = config.visualizer.WSIZE
+        if self.WSIZE % 2 != 0:
             raise ValueError('The parameter wsize (window size) must be even')
 
         self.WSIDE = self.WSIZE / 2
-        print ' Window size: %d'%self.WSIZE
+
+
+        # configuring locations
+        self.locations = Locations(config)
+        if self.locations.subject is not None:
+            self.set_subject(locations.subject)
+
+        # configuring helper objects
+        self.utils = ImageUtils(config)
+        self.image_helper = ImageSetHelper()
+
+        print ' Deep Histo Visualizer'
+        print '----------------------'
+        print
+        print ' Window size: %d' % self.WSIZE
+        print ' Color map  : %s' % self.colormap
+        print ' Label range: (%d, %d)' % (self.vmin, self.vmax)
+
 
     def reset(self):
+        """
+        Resets the visualizer. Closes the figure if it is still open
+        """
 
         if self.fig is not None:
             plt.close(self.fig)
@@ -166,24 +189,25 @@ class Visualizer:
         self.drs = []
         self.axs = []
         self.bxs = []
-        self.vmin = 0
-        self.vmax = 255
 
     def set_subject(self, subject):
+        """
+        Resets the visualizer and loads the images corresponding to the subject passed as a parameter
+        """
 
         self.reset()
 
         print
-        print 'Setting subject for PatchVisualizer'
-        print '---------------------------------------'
+        print 'Setting subject for Visualizer'
+        print '------------------------------'
 
         self.subject = subject
 
         print 'Subject [%s]' % self.subject
         self.utils.set_subject(subject)
 
-        (self.vmin, self.vmax) = self.utils.get_dynrange_histo()  # makes sure the range is uniform for all slices
-        print 'Dynamic range for histology: %d, %d' % (self.vmin, self.vmax)
+
+
 
         self.indices = self.utils.get_annotation_indices()
         print 'Available slices: %s' % self.indices
@@ -191,23 +215,18 @@ class Visualizer:
         self.image_helper.load(self.utils, self.indices)
 
         slice_num = self.indices[0]
-        print 'Selecting first slice: [%s]' % slice_num
         self.set_slice(slice_num)
+
 
     def set_slice(self, i):
 
         self.slice_num = i
-
         print 'Setting slice [%d]' % i
         idx = self.indices.index(i)
         self.mask = self.image_helper.mask_set[idx]
-        self.images = self.image_helper.image_set[idx]
-        self.histo = self.image_helper.histo_set[idx]
+        self.images = self.image_helper.sources_set[idx]
+        self.histo = self.image_helper.label_set[idx]
         self.histo_flat = self.histo[:, :, 0]  # to show with color maps
-
-        # self.histo_flat[(self.histo_flat <1)] = 0
-        # self.histo_flat[(self.histo_flat >=1)] = 5 #surgery
-
         self.pimages = self.image_helper.pimage_set[idx]
         self.num_sources = len(self.pimages)
 
@@ -234,6 +253,16 @@ class Visualizer:
     def get_annotation_indices(self):
         return self.utils.get_annotation_indices()
 
+    def _update_title(self):
+        """
+        Updates the title
+        :return:
+        """
+        if (self.fig is not None):
+            self.fig.canvas.set_window_title('DeepHisto %s' % (self.config.STUDY_NAME))
+            self.fig.suptitle('DeepHisto subject: %s slice: %s patch: %d, %d' % (
+                self.subject, self.slice_num, self._patch_x, self._patch_y), fontsize=16, color='white')
+
     def init(self):
         """
         Initializes the main visualization
@@ -246,10 +275,8 @@ class Visualizer:
 
         # plt.ion()
         self.fig = plt.figure(facecolor='black')
-        self.fig.canvas.set_window_title(
-                'DeepHisto subject: %s slice:%s patch: (%d, %d)' % (self.subject, self.slice_num, 0, 0))
-        self.fig.suptitle('DeepHisto subject: %s slice:%s patch: (%d, %d)' % (self.subject, self.slice_num, 0, 0),
-                          fontsize=18, color='white')
+        self.fig.canvas.set_window_title('DeepHisto [%s]' % (self.config.STUDY_NAME))
+        self.fig.suptitle('Subject: %s slice: %s' % (self.subject, self.slice_num), fontsize=16, color='white')
 
         mpl.rcParams['keymap.save'] = ''
 
@@ -281,7 +308,7 @@ class Visualizer:
             ax.imshow(images[i], interpolation='none')
             ax.imshow(mask, alpha=0.3)
             ax.get_xaxis().set_visible(False)
-            ax.set_ylabel(self.utils.locations.LABELS[i], fontsize=16, color='#cccccc', rotation=0)
+            ax.set_ylabel(self.utils.locations.TYPES[i], fontsize=16, color='#cccccc', rotation=0)
             ax.get_yaxis().set_ticks([])
 
             bx = self.fig.add_subplot(gs[A:B, 2:4])
@@ -296,9 +323,9 @@ class Visualizer:
         ax = self.fig.add_subplot(gs[0:2, 4:6], sharex=first_ax, sharey=first_ax)
         ax.set_axis_bgcolor('black')
         self._histo_flat_im = ax.imshow(self.histo_flat, interpolation='none', vmin=self.vmin, vmax=self.vmax,
-                                        cmap='jet')
+                                        cmap=self.colormap)
 
-        ax.imshow(mask, alpha=0.3)
+        #ax.imshow(mask, alpha=0.3)
         ax.get_yaxis().set_visible(False)
         ax.set_xlabel('Histology', fontsize=16, color='#cccccc')
         ax.get_xaxis().set_ticks([])
@@ -348,7 +375,7 @@ class Visualizer:
         im = Image.fromarray(self.histo).crop(
                 (x - self.WSIDE, y - self.WSIDE, x + self.WSIDE, y + self.WSIDE))
         im = np.array(im)[:, :, 0]
-        self._imhisto = self.bxs[-1].imshow(im, interpolation='none', vmin=self.vmin, vmax=self.vmax, cmap='jet')
+        self._imhisto = self.bxs[-1].imshow(im, interpolation='none', vmin=self.vmin, vmax=self.vmax, cmap=self.colormap)
         self._update_pixel_picker(im)
 
     def _update_pixel_picker(self, zoomed_histo):
@@ -360,7 +387,7 @@ class Visualizer:
             col = int(y + 0.5)
             if col >= 0 and col < numcols and row >= 0 and row < numrows:
                 z = zoomed_histo[col, row]
-                return 'x=%d, y=%d, Neuronal Count =%d' % (col, row, z)
+                return 'x=%d, y=%d, LABEL =%d' % (col, row, z)
             else:
                 return 'x=%d, y=%d' % (y, x)
 
@@ -382,16 +409,7 @@ class Visualizer:
             dr.connect()
             self.drs.append(dr)
 
-    def _update_title(self):
-        """
-        Updates the title
-        :return:
-        """
-        if (self.fig is not None):
-            self.fig.canvas.set_window_title('DeepHisto subject: %s slice:%s patch: (%d, %d)' % (
-                self.subject, self.slice_num, self._patch_x, self._patch_y))
-            self.fig.suptitle('DeepHisto subject: %s slice:%s patch: (%d, %d)' % (
-                self.subject, self.slice_num, self._patch_x, self._patch_y), fontsize=18, color='white')
+
 
     def create_patch(self, x, y):
         '''
@@ -412,7 +430,7 @@ class Visualizer:
         numrows, numcols = im.shape
 
         self._update_pixel_picker(im)
-        #@TODO: show a color bar
+        # @TODO: show a color bar
         # clbar = plt.colorbar(self._histo_flat_im , ax=self.bxs[-1], ticks=range(self.vmin, self.vmax + 1, 2))
         # plt.setp(plt.getp(clbar.ax.axes, 'yticklabels'), color='w')
 
@@ -447,6 +465,6 @@ class Visualizer:
         for i, ax in enumerate(self.axs[:-1]):
             ax.imshow(images[i], interpolation='none')
             ax.imshow(mask, alpha=0.3)
-        self.axs[-1].imshow(self.histo_flat, interpolation='none', vmin=self.vmin, vmax=self.vmax)
-        self.axs[-1].imshow(mask, alpha=0.3)
+        self.axs[-1].imshow(self.histo_flat, interpolation='none', vmin=self.vmin, vmax=self.vmax, cmap=self.colormap)
+        #self.axs[-1].imshow(mask, alpha=0.3)
         self.update_patch(self._patch_x, self._patch_y)

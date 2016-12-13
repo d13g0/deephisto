@@ -15,9 +15,9 @@ from caffe import layers as L, params as P
 from caffe.coord_map import crop
 
 from deephisto import PatchSampler, Console
-from CaffeLocations import CaffeLocations
+from caffe_settings import CaffeSettings
 
-sys.path.insert(0, CaffeLocations.CAFFE_CODE_DIR)
+sys.path.insert(0, CaffeSettings.CAFFE_CODE_DIR)
 
 def conv_relu(bottom, nout, ks=3, stride=1, pad=1):
     conv = L.Convolution(bottom,
@@ -48,13 +48,13 @@ class NetBuilder:
 
         self.name = name
         self.WSIZE = wsize
-        self.NET_DIR = CaffeLocations.NET_DIR + '/' + name
-        self.SPLIT_DIR = CaffeLocations.SPLIT_DIR + '/' + data_dir
+        self.NET_DIR = CaffeSettings.NET_DIR + '/' + name
+        self.SPLIT_DIR = CaffeSettings.SPLIT_DIR + '/' + data_dir
 
         if data_dir is None:
-            self.DATA_DIR = CaffeLocations.PATCHES_DIR
+            self.DATA_DIR = CaffeSettings.PATCHES_DIR
         else:
-            self.DATA_DIR = CaffeLocations.PATCHES_DIR + '/' + data_dir
+            self.DATA_DIR = CaffeSettings.PATCHES_DIR + '/' + data_dir
 
         print
         print 'Network Builder'
@@ -66,7 +66,7 @@ class NetBuilder:
         n = caffe.NetSpec()
 
 
-        if stage != CaffeLocations.STAGE_DEPLOY:
+        if stage != CaffeSettings.STAGE_DEPLOY:
             source_params = dict(stage=stage)
             source_params['data_dir'] = self.DATA_DIR
             source_params['split_dir'] = self.SPLIT_DIR
@@ -110,7 +110,7 @@ class NetBuilder:
 
 
         n.score_fr = L.Convolution(n.drop7,
-                                   num_output=CaffeLocations.NUM_LABELS,
+                                   num_output=CaffeSettings.NUM_LABELS,
                                    kernel_size=1,
                                    pad=0,
                                    param=[dict(lr_mult=1, decay_mult=1), dict(lr_mult=2, decay_mult=0)],
@@ -120,7 +120,7 @@ class NetBuilder:
 
         n.deconv = L.Deconvolution(n.score_fr,
                                    convolution_param=dict(
-                                           num_output=CaffeLocations.NUM_LABELS,
+                                           num_output=CaffeSettings.NUM_LABELS,
                                            kernel_size=64,
                                            stride=32,
                                            bias_term=False,
@@ -133,7 +133,7 @@ class NetBuilder:
 
         n.score = crop(n.deconv, n.data)
 
-        if stage != CaffeLocations.STAGE_DEPLOY:
+        if stage != CaffeSettings.STAGE_DEPLOY:
             #n.loss = L.SoftmaxWithLoss(n.score, n.label, loss_param=dict(normalize=False))  # , ignore_label=0
             n.loss = L.Python(n.score, n.label, module='LossLayer', layer='TopoLossLayer', loss_weight=1)
 
@@ -149,13 +149,13 @@ class NetBuilder:
         print 'Data dir           : %s' % self.DATA_DIR
         print 'Split dir          : %s' % self.SPLIT_DIR
 
-        train_file = self.NET_DIR + '/' + CaffeLocations.TRAINING_PROTO
-        val_file = self.NET_DIR + '/' + CaffeLocations.VALIDATION_PROTO
-        deploy_file = self.NET_DIR + '/' + CaffeLocations.DEPLOY_PROTO
+        train_file = self.NET_DIR + '/' + CaffeSettings.TRAINING_PROTO
+        val_file = self.NET_DIR + '/' + CaffeSettings.VALIDATION_PROTO
+        deploy_file = self.NET_DIR + '/' + CaffeSettings.DEPLOY_PROTO
 
-        train_proto = self.define_structure(CaffeLocations.STAGE_TRAIN)
-        val_proto = self.define_structure(CaffeLocations.STAGE_VALIDATION)
-        deploy_proto = self.define_structure(CaffeLocations.STAGE_DEPLOY)
+        train_proto = self.define_structure(CaffeSettings.STAGE_TRAIN)
+        val_proto = self.define_structure(CaffeSettings.STAGE_VALIDATION)
+        deploy_proto = self.define_structure(CaffeSettings.STAGE_DEPLOY)
 
         if not os.path.exists(os.path.dirname(train_file)):
             print Console.WARNING + 'Creating directory %s' % os.path.dirname(train_file) + Console.ENDC

@@ -1,3 +1,10 @@
+#  This file makes part of DEEP HISTO
+#
+#  Deep Histo is a medical imaging project that uses deep learning to
+#  predict histological features from MRI.
+#
+#  Author: Diego Cantor
+
 from subjects import dh_load_subjects
 from deephisto import PatchSampler, PatchCreator, Locations, ImageUtils
 

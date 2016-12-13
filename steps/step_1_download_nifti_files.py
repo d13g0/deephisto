@@ -1,52 +1,33 @@
-from subjects import dh_load_subjects
-from deephisto import ImageRetriever, Locations
+#  This file makes part of DEEP HISTO
+#
+#  Deep Histo is a medical imaging project that uses deep learning to
+#  predict histological features from MRI.
+#
+#  Author: Diego Cantor
+#
 
-"""
-This is the first step you need to run on your DeepHisto project. Please configure the paths
-according to your installation. In this example, I have mounted the remote directories on /home/dcantor/remote
+from deephisto import ImageRetriever
+
+from config import dh_load_subjects, dh_read_config
 
 
-Also, this example shows two dictionaries: sources and targets. Make sure that both have the same keys. Copying
-from the remote location to the local one is one-to-one based on these keys. Also if you are including other images
-in your experiment you can expand/modify this dictionary. For example, if you had more source images other than
-FA, MD and MR, you could create the corresponding keys in the source and target dictionaries to add them.
 
-"""
-
-def dh_download_nifti_files(subjects, loc):
+def main():
     """
-    Downloads the NIFTI images (MRI, DTI, HISTO) from the remote location.
+    This is the first step you need to run on your DeepHisto project.
+    Use one of the configuration files or create your own.
+
+    >> config_neuronal_densitiy.ini
+    >> config_field_fraction.ini
+
     """
+    config = dh_read_config('/home/dcantor/projects/deephisto/code/config_neuronal_density.ini')
+    #config = dh_read_config('/home/dcantor/projects/deephisto/code/config_field_fraction.ini')
 
-    root = loc.ROOT_DIR
-
-    # %s will be replaced by EPI_PXXX according to the SUBJECTS list (see subjects.py)
-    remote_exvivo_dir = '/home/dcantor/remote/epilepsy/%s/Processed/Ex-Hist_Reg/9.4T/Neo/aligned_Ex_100um/'
-    remote_histo_dir = '/home/dcantor/remote/histology/Histology/%s/100um_5umPad_FeatureMaps/aligned/Neo_NEUN/'
-    sources = {     # a map indicating the remote locations ofr these files
-        'FA': remote_exvivo_dir + 'dti_smoothed_0.2/dti_FA.100um.nii.gz',
-        'MD': remote_exvivo_dir + 'dti_smoothed_0.2/dti_MD.100um.nii.gz',
-        'MR': remote_exvivo_dir + 'reg_ex_mri_100um.nii.gz',
-        'HI': remote_histo_dir + 'count_deformable_100um.nii.gz'
-    }
-
-    local_exvivo_dir = root + '/subjects/%s/exvivo/'
-    local_histo_dir = root + '/subjects/%s/hist/'
-    targets = {     # a map indicating where the remote files will be copied
-        'FA': local_exvivo_dir + 'dti_FA.100um.nii.gz',
-        'MD': local_exvivo_dir + 'dti_MD.100um.nii.gz',
-        'MR': local_exvivo_dir + 'reg_ex_mri_100um.nii.gz',
-        'HI': local_histo_dir + 'count_deformable_100um.nii.gz'
-
-    }
-
-
-    dog = ImageRetriever(loc, sources, targets)
+    subjects = dh_load_subjects(config)
+    dog = ImageRetriever(config)
     for s in subjects:
         dog.retrieve(s)
 
-
-if __name__=='__main__':
-    locations = Locations('/home/dcantor/projects/deephisto')
-    subjects = dh_load_subjects()
-    dh_download_nifti_files(subjects, locations)
+if __name__ == '__main__':
+    main()

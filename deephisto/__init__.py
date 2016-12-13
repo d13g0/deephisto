@@ -1,9 +1,4 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Aug 30 17:27:31 2016
 
-@author: dcantor
-"""
 from utils.console import Console
 from locations import Locations
 from patch import PatchSampler, PatchCreator

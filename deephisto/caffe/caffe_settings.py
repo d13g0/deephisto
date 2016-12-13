@@ -1,6 +1,6 @@
 import numpy as np
 
-class CaffeLocations:
+class CaffeSettings:
     """
     This file contains variables and paths specific to caffe processing.
     """

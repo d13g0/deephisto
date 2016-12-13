@@ -9,11 +9,11 @@ from itertools import product
 import matplotlib.pyplot as plt
 import caffe
 from PIL import Image
-from CaffeLocations import CaffeLocations
+from caffe_settings import CaffeSettings
 
 
 # Making sure that this file is visible to caffe
-sys.path.insert(0, CaffeLocations.CAFFE_CODE_DIR)
+sys.path.insert(0, CaffeSettings.CAFFE_CODE_DIR)
 
 class NetInteractor:
     def __init__(self):
@@ -33,14 +33,14 @@ class NetInteractor:
         self.ax = None
         self.validation_data = None
         self.training_data = None
-        self.mean = CaffeLocations.TRAINING_MEAN #None
+        self.mean = CaffeSettings.TRAINING_MEAN #None
         self.data_dir = None
         self.PANEL_ROWS = 5
         self.PANEL_COLS = 4
         self.verbose = True
 
     def load_avg_image(self):
-        avg_img_file = CaffeLocations.SPLIT_DIR + '/' + self.data_dir + '/' + CaffeLocations.AVG_IMG
+        avg_img_file = CaffeSettings.SPLIT_DIR + '/' + self.data_dir + '/' + CaffeSettings.AVG_IMG
         self.mean = np.array(Image.open(avg_img_file)) #CaffeLocations.TRAINING_MEAN #
         #print 'Average training image %s loaded'%avg_img_file
 
@@ -50,13 +50,13 @@ class NetInteractor:
         if data_dir == None:
             data_dir = self.data_dir
 
-        datafile = CaffeLocations.SPLIT_DIR + '/%s/validation.txt'%data_dir
+        datafile = CaffeSettings.SPLIT_DIR + '/%s/validation.txt' % data_dir
         with open(datafile, 'r') as dfile:
             lines = dfile.read().splitlines()
             self.validation_data = [f.split(';')[0] for f in lines]
             #print 'Training split %s loaded' % datafile
 
-        datafile = CaffeLocations.SPLIT_DIR + '/%s/training.txt'%data_dir
+        datafile = CaffeSettings.SPLIT_DIR + '/%s/training.txt' % data_dir
         with open(datafile, 'r') as dfile:
             lines = dfile.read().splitlines()
             self.training_data = [f.split(';')[0] for f in lines]
@@ -100,8 +100,8 @@ class NetInteractor:
 
         #loads the  caffe network (deploy.prototxt) with the respective weights
         #ready to make predictions
-        weights = CaffeLocations.SNAPSHOT_DIR % (directory, epoch)
-        model = CaffeLocations.NET_DIR + '/'+ directory +'/'+ CaffeLocations.DEPLOY_PROTO
+        weights = CaffeSettings.SNAPSHOT_DIR % (directory, epoch)
+        model = CaffeSettings.NET_DIR + '/' + directory + '/' + CaffeSettings.DEPLOY_PROTO
         self.net = caffe.Net(model, caffe.TEST, weights=weights)
 
         if self.verbose:
@@ -142,7 +142,7 @@ class NetInteractor:
             # if not specific patch is sought. Then get a random one from the validation list
             N = len(self.validation_data)
             idx = np.random.randint(0, N - 1)
-            image_file = CaffeLocations.PATCHES_DIR + '/'+ self.data_dir +'/'+ self.validation_data[idx]
+            image_file = CaffeSettings.PATCHES_DIR + '/' + self.data_dir + '/' + self.validation_data[idx]
         else:
             # retrieve the paths to the image and label files
             if not patch_name.endswith('.png'):
@@ -162,7 +162,7 @@ class NetInteractor:
             else:
                 raise Exception('%s does not exist' % patch_name)
 
-            image_file = CaffeLocations.PATCHES_DIR + '/'+ self.data_dir +'/' + image_file
+            image_file = CaffeSettings.PATCHES_DIR + '/' + self.data_dir + '/' + image_file
             idx = None
 
         label_file = image_file.replace('MU', 'HI')
@@ -265,7 +265,7 @@ class NetInteractor:
         for i, j in product(range(0, ROWS), range(0, COLS)):
             k = j * ROWS + i
             label = self.labels[k]
-            ax[i,2*j].imshow(label, interpolation='None', cmap='jet', vmin=0, vmax=CaffeLocations.NUM_LABELS)
+            ax[i,2*j].imshow(label, interpolation='None', cmap='jet', vmin=0, vmax=CaffeSettings.NUM_LABELS)
             ax[i,2*j].format_coord = self._get_formatter('Source:  %s' % self.filenames[k], label)
         plt.subplots_adjust(top=0.9, left=0, bottom=0, right=1, wspace=0, hspace=0)
         plt.draw()
@@ -286,7 +286,7 @@ class NetInteractor:
             k = j * ROWS + i
             pred = self.predictions[k]
             self.ax[i, 2 * j + 1].imshow(pred, interpolation='None', cmap='jet', vmin=0,
-                                         vmax=CaffeLocations.NUM_LABELS)
+                                         vmax=CaffeSettings.NUM_LABELS)
             self.ax[i, 2 * j + 1].format_coord = self._get_formatter('Prediction: value %d', pred)
         plt.subplots_adjust(top=0.9, left=0, bottom=0, right=1, wspace=0, hspace=0)
         plt.draw()
@@ -328,11 +328,11 @@ class NetInteractor:
         ax[1].imshow(img1, interpolation='none')
 
         ax[2].set_title('GT')
-        img2 = ax[2].imshow(label, interpolation='None', cmap='jet', vmin=0, vmax=CaffeLocations.NUM_LABELS)
+        img2 = ax[2].imshow(label, interpolation='None', cmap='jet', vmin=0, vmax=CaffeSettings.NUM_LABELS)
         ax[2].format_coord = self._get_formatter('Ground Truth', label)
 
         ax[3].set_title('PR')
-        img3 = ax[3].imshow(pred, interpolation='none', vmin=0, vmax=CaffeLocations.NUM_LABELS)
+        img3 = ax[3].imshow(pred, interpolation='none', vmin=0, vmax=CaffeSettings.NUM_LABELS)
         ax[3].format_coord = self._get_formatter('Prediction', pred)
 
         for i in range(0, 4):
@@ -347,7 +347,7 @@ class NetInteractor:
         fig.canvas.set_window_title('Channels')
         for i in range(N):
             ax[i].set_title('%d'%i)
-            ax[i].imshow(channels[i], interpolation='none', vmin=0,vmax=CaffeLocations.NUM_LABELS)
+            ax[i].imshow(channels[i], interpolation='none', vmin=0, vmax=CaffeSettings.NUM_LABELS)
             ax[i].get_xaxis().set_visible(False)
             ax[i].get_yaxis().set_visible(False)
             ax[i].format_coord = self._get_formatter('Channel %d'%i, channels[i])

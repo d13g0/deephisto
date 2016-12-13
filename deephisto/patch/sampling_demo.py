@@ -25,8 +25,8 @@ class PatchSamplingDemo:
         self.subject = subject
         self.index = index
         self.utils.set_subject(subject)
-        self.mask = self.utils.load_mask_png(index)
-        self.bmask = self.utils.get_binary_mask(index)
+        self.mask = self.utils.load_mask_for_slice(index)
+        self.bmask = self.utils.load_binary_mask_for_slice(index)
         self.sampler = sampler
         self.sampler.set_mask(self.bmask)
 

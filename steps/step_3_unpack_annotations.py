@@ -1,10 +1,17 @@
-from subjects import dh_load_subjects
+#  This file makes part of DEEP HISTO
+#
+#  Deep Histo is a medical imaging project that uses deep learning to
+#  predict histological features from MRI.
+#
+#  Author: Diego Cantor
+
+from config import dh_load_subjects, dh_read_config
 from deephisto import ImageUtils, Locations
 
 
-def dh_unpack_annotations(subjects, locations):
+def dh_unpack_annotations(config):
     """
-    The Histology PNGs (S_HI_x.png) are uploaded to  PLEXO (http://plexo.link) for every subject
+    The Histology PNGs (S_H_x.png) are uploaded to  PLEXO (http://plexo.link) for every subject
     to manually annotate the cortex.
 
     These annotations are saved as a ZIP file under the annotations folder for every patient
@@ -14,22 +21,19 @@ def dh_unpack_annotations(subjects, locations):
     This is an important step, so DeepHisto can tell which slices from every patient are actually annotated and
     which ones are not.
     """
-    utils = ImageUtils(locations)
+    utils = ImageUtils(config)
+    subjects = dh_load_subjects(config)
     for s in subjects:
         utils.set_subject(s)
         utils.unpack_annotations()
 
-def dh_get_histo_range(subjects, locations):
-    utils = ImageUtils(locations)
-    for s in subjects:
-        print
-        print s
-        print '---------------------------------'
-        utils.set_subject(s)
-        utils.get_dynrange_histo()
+
+
+def main():
+    #config = dh_read_config('/home/dcantor/projects/deephisto/code/config_neuronal_density.ini')
+    config = dh_read_config('/home/dcantor/projects/deephisto/code/config_field_fraction.ini')
+    dh_unpack_annotations(config)
 
 if __name__=='__main__':
-    locations = Locations('/home/dcantor/projects/deephisto')
-    subjects = dh_load_subjects()
-    dh_unpack_annotations(subjects, locations)
-    dh_get_histo_range(subjects, locations)
+    main()
+

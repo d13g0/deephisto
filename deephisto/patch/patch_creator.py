@@ -43,16 +43,16 @@ class PatchCreator:
 
         utils = self.utils
 
-        bmask = self.utils.get_binary_mask(index)
+        bmask = self.utils.load_binary_mask_for_slice(index)
         self.sampler.set_mask(bmask)
 
         self.pimages = []
 
-        images = self.utils.load_source_png_images(index)
+        images = self.utils.load_sources_for_slice(index)
         for j in images:
             self.pimages.append(Image.fromarray(j))
 
-        histo = self.utils.load_unscaled_histo_png_image(index)
+        histo = self.utils.load_labels_for_slice(index)
         self.pimages.append(Image.fromarray(histo))
         print
         print 'Sampling subject %s, slice %d'%(self.subject, self.index)

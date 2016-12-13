@@ -1,4 +1,4 @@
-from .CaffeLocations import CaffeLocations
+from .caffe_settings import CaffeSettings
 from .DataLayer import DataLayer
 from .net_builder import NetBuilder
 from .net_builder_dj_pool4 import NetBuilderDeepJet_pool4

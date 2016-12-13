@@ -9,7 +9,7 @@ from PIL import Image
 import caffe
 
 from deephisto import ImageUtils, Locations, PatchSampler
-from deephisto.caffe import CaffeLocations
+from deephisto.caffe import CaffeSettings
 
 
 class NetTest:
@@ -51,14 +51,14 @@ class NetTest:
         utils.set_subject(subject)
 
         try:
-            self.mask = utils.load_mask_png(index)
+            self.mask = utils.load_mask_for_slice(index)
         except IOError:
             raise ValueError('The slice %d does not exist or has not been annotated' % index)
 
         self.target = Image.fromarray(np.zeros(shape=self.mask.shape[0:2]))
-        self.bmask = utils.get_binary_mask(self.index)
+        self.bmask = utils.load_binary_mask_for_slice(self.index)
 
-        self.hist = utils.load_unscaled_histo_png_image(index)
+        self.hist = utils.load_labels_for_slice(index)
         self.hist_flat = self.hist[:, :, 0]
 
         self.input = utils.load_multichannel_input(index)
@@ -70,15 +70,15 @@ class NetTest:
         self.directory = directory
         self.epoch = epoch
 
-        model = CaffeLocations.SNAPSHOT_DIR % (directory, epoch)
+        model = CaffeSettings.SNAPSHOT_DIR % (directory, epoch)
         print 'Loading %s' % model
 
         #load network from 'directory'
-        net_def = CaffeLocations.NET_DIR + '/' + directory + '/' + CaffeLocations.DEPLOY_PROTO
+        net_def = CaffeSettings.NET_DIR + '/' + directory + '/' + CaffeSettings.DEPLOY_PROTO
         self.net = caffe.Net(net_def, caffe.TEST, weights=model)
 
         #load mean to preprocess samples form 'data_dir'
-        avg_img_file = CaffeLocations.SPLIT_DIR + '/' + split_dir + '/' + CaffeLocations.AVG_IMG
+        avg_img_file = CaffeSettings.SPLIT_DIR + '/' + split_dir + '/' + CaffeSettings.AVG_IMG
         self.mean = np.array(Image.open(avg_img_file))
 
 
@@ -102,12 +102,12 @@ class NetTest:
 
         ax[1].set_axis_bgcolor('black')
         ax[1].set_title('ground truth', color='white')
-        ax[1].imshow(self.hist_flat, cmap='jet', interpolation='None',vmin=0, vmax=CaffeLocations.NUM_LABELS )
+        ax[1].imshow(self.hist_flat, cmap='jet', interpolation='None', vmin=0, vmax=CaffeSettings.NUM_LABELS)
         ax[1].format_coord = self._get_formatter('Ground Truth', self.hist_flat)
 
         ax[2].set_axis_bgcolor('black')
         ax[2].set_title('prediction', color='white')
-        self.plot_img = ax[2].imshow(np.zeros(shape=self.mask.shape), interpolation='None', cmap='jet', vmin=0, vmax=CaffeLocations.NUM_LABELS)
+        self.plot_img = ax[2].imshow(np.zeros(shape=self.mask.shape), interpolation='None', cmap='jet', vmin=0, vmax=CaffeSettings.NUM_LABELS)
 
 
         self.rect = ppa.Rectangle((0, 0), self.WSIZE, self.WSIZE, linewidth=1, edgecolor='#ff0000', facecolor='none', alpha=0.5)
@@ -121,7 +121,7 @@ class NetTest:
 
     def new_pass(self):
         self.target = Image.fromarray(np.zeros(shape=self.mask.shape[0:2]))
-        self.plot_img = self.ax[2].imshow(np.zeros(shape=self.mask.shape), interpolation='None', cmap='jet', vmin=0, vmax=CaffeLocations.NUM_LABELS)
+        self.plot_img = self.ax[2].imshow(np.zeros(shape=self.mask.shape), interpolation='None', cmap='jet', vmin=0, vmax=CaffeSettings.NUM_LABELS)
 
     def update_pass(self, x, y, data):
 

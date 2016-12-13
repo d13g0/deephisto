@@ -3,10 +3,10 @@ import caffe
 import numpy as np
 from PIL import Image
 
-from CaffeLocations import CaffeLocations
+from caffe_settings import CaffeSettings
 
 # Making sure that this file is visible to caffe
-sys.path.insert(0, CaffeLocations.CAFFE_CODE_DIR)
+sys.path.insert(0, CaffeSettings.CAFFE_CODE_DIR)
 
 
 class DataLayer(caffe.Layer):
@@ -34,7 +34,7 @@ class DataLayer(caffe.Layer):
         self.seed = params.get('seed', None)
         self.angle = 0
 
-        avg_img_file = self.split_dir + '/' + CaffeLocations.AVG_IMG
+        avg_img_file = self.split_dir + '/' + CaffeSettings.AVG_IMG
         self.mean = np.array(Image.open(avg_img_file))  # CaffeLocations.TRAINING_MEAN #
 
         datafile = '%s/%s.txt' % (self.split_dir, self.stage)  # stage = (training, validation)
@@ -42,7 +42,7 @@ class DataLayer(caffe.Layer):
         self.indices = open(datafile, 'r').read().splitlines()
         self.idx = 0
 
-        if self.stage != CaffeLocations.STAGE_TRAIN:
+        if self.stage != CaffeSettings.STAGE_TRAIN:
             self.random = False
 
         if self.random:
