@@ -174,7 +174,7 @@ class ImageUtils:
         print '\tMRI'
         for volume_idx, volume in enumerate(input_volumes):
             for index in range(NUM_SLICES):
-                type = self.locations.TYPES[volume_idx]
+                type = self.locations.SOURCE_TYPES[volume_idx]
                 imslice = ImageUtils.data_to_bytescale_rgb(volume[:, :, index])
                 im = Image.fromarray(imslice)
 
@@ -214,6 +214,7 @@ class ImageUtils:
        files = [fn for fn in os.listdir(self.locations.MASK_DIR) if fn.endswith('.png')]
        indices = []
        for fn in files:
+           # @TODO: (hardcode) If histo_png, slice_mask under [png] changes, this code is affected.
            index  = int(fn.split('_')[2].split('.')[0])  #A_H_5.png = A, H, 5.png
            indices.append(index)
            indices.sort()
@@ -316,7 +317,10 @@ class ImageUtils:
         """
         Loads the respective source png images for the slice being analyzed
         Returns an array with the source PNGs for the requested index.
+
+        **NOTE**
         The order in this array is the same order of location.TYPES
+
         A subject must be set before calling this method
         """
         if self.subject is None:
@@ -324,7 +328,7 @@ class ImageUtils:
 
         
         data = []    
-        for type in self.locations.TYPES:
+        for type in self.locations.SOURCE_TYPES:
             slice_data = misc.imread(self.locations.get_source_png_location(type,index))
             data.append(slice_data)
             
@@ -345,11 +349,7 @@ class ImageUtils:
 
     def load_multichannel_input(self, num_slice):
         """
-        Creates a multi-channel array with all the inputs:
-         R->MRI
-         G->FA
-         B->MD
-         for now..
+        Load the inputs. The order is determined by locations.SOURCE_TYPES
         """
         data = np.array(self.load_sources_for_slice(num_slice))
         items, w, h, channels = data.shape

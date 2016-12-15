@@ -7,12 +7,17 @@ from PIL import Image
 from random import shuffle
 
 from deephisto.utils.console import Console
+from deephisto import Locations
 
 
 class DatasetCreator:
 
-    def __init__(self, locations, training=0.7):
-        self.locations = locations
+    def __init__(self, config):
+
+        self.config = config
+        self.locations = Locations(config)
+        training = config.TRAINING_PERCENTAGE
+
         if training <= 0 or training > 1:
             print Console.FAIL + 'Training percercentage must be in the (0,1] range' + Console.ENDC
             raise AssertionError
@@ -20,23 +25,25 @@ class DatasetCreator:
         self.training = training  #number from 0 to 1 percentage of the dataset dedicated to training
         self.validation = 1 - training  #the complement to 1 of the training split
 
-    def create_from(self, DS_DIR):
-        data_dir = self.locations.PATCHES_DIR + '/' + DS_DIR
-        route = data_dir + '/*.png'
+    def run(self):
+
+        patch_dir = self.config.PATCH_DIR
+
         print
-        print 'Creating datasets'
+        print 'Dataset creation'
         print '-----------------'
-        print 'Route: %s'%route
+        print 'Patch directory : %s'%patch_dir
         print 'Training percentage      : %d%%'% (self.training * 100)
         print 'Validation percentage    : %d%%'% (self.validation *100)
+        print
+        print Console.UNDERLINE + 'Please be patient while the patches directory is analyzed' + Console.ENDC
+        files = glob.glob(patch_dir + '/*.png')
+        print 'done.'
 
-        files = glob.glob(route)
-
-
-        sources = [os.path.basename(f) for f in files if '_MU_' in f]
+        sources = [os.path.basename(f) for f in files if os.path.basename(f).startswith('I_')] #review this
         L = len(sources)
         print
-        print 'Input size               : '+ Console.OKBLUE + '%d'%L + Console.ENDC
+        print 'Number of input patches : '+ Console.OKBLUE + '%d'%L + Console.ENDC
         targets = []
 
         if len(sources) == 0:
@@ -45,11 +52,15 @@ class DatasetCreator:
         dict ={}
 
         for s in sources:
-            _,_,P,slice,_,x,y = s.split('_') #P_EPI_PXXX_1_TYPE_X_Y.png
-            patient = 'EPI_%s'%P
+            # @TODO (hardcode) if patch_template in [patches] change, this code is affected
+            _,_,P,slice,x,y = s.split('_') #{type}_{subject}_{index}_{x}_{y}.png
+            subject = 'EPI_%s'%P
             y,_ = y.split('.')
-            target_path = self.locations.PATCH_TEMPLATE%(DS_DIR, patient,int(slice),'HI',int(x),int(y)) #/P_%s_%d_%s_%d_%d.png'
+
+            #check that the label file exists
+            target_path = self.config.PATCH_TEMPLATE.format(subject=subject, index=int(slice), type='L', x=int(x), y=int(y))
             target = os.path.basename(target_path)
+
             if os.path.isfile(target_path):
                 exists = True
                 targets.append(target)
@@ -66,25 +77,22 @@ class DatasetCreator:
 
         #separate training and validation sets
 
-        slides = {}
-
+        slices = {}
+        """
+        This loop creates an array of slices. The name of the slice is the 
+        subject name + slice number.
+        """
         for input, label in map:
-
-            key = '_'.join(input.split('_')[0:4])
-            if not key in slides:
-                slides[key] = [(input,label)]
+            slice_key = '_'.join(input.split('_')[1:4])  #@TODO (hardcode) depends on patch_template under [patches]
+            if not slice_key in slices:
+                slices[slice_key] = [(input,label)]
             else:
-                slides[key].append((input,label))
+                slices[slice_key].append((input,label))
 
-        keys = slides.keys()
+        keys = slices.keys()
         M = len(keys)
+
         keys.sort()
-
-        # print
-        # print 'Totals'
-        # for key in keys:
-        #     print key, len(slides[key])
-
         shuffle(keys)
         shuffle(keys)
         shuffle(keys)
@@ -96,13 +104,14 @@ class DatasetCreator:
         validation_patches = []
         idx = 0
 
+        print
         print 'Training patches'
         print '----------------'
         while sum < threshold:
-            key = keys[idx]
-            training_patches += slides[key]
-            sum += len(slides[key])
-            print key, len(slides[key])
+            slice_key = keys[idx]
+            training_patches += slices[slice_key]
+            sum += len(slices[slice_key])
+            print slice_key, len(slices[slice_key])
             idx +=1
         print
         print 'Total : %d'%sum
@@ -113,10 +122,10 @@ class DatasetCreator:
         print '------------------'
         sum = 0
         for j in range(idx, M):
-            key = keys[j]
-            validation_patches += slides[key]
-            sum += len(slides[key])
-            print key, len(slides[key])
+            slice_key = keys[j]
+            validation_patches += slices[slice_key]
+            sum += len(slices[slice_key])
+            print slice_key, len(slices[slice_key])
 
         print 'Total : %d' % sum
 
@@ -131,79 +140,34 @@ class DatasetCreator:
         print 'Validation dataset size  : %s'%Console.OKBLUE + str(len(validation_patches)) + Console.ENDC
         print
 
+        DATASET_DIR = self.config.DATASET_DIR
+        self._write_files(training_patches, validation_patches, DATASET_DIR)
+        self._compute_average(DATASET_DIR)
 
 
-        # idx = 0
-        # N = len(map)
-        # train_indices = None
-        # validation_indices = None
-        # print 'Number of elements       : %d'%N
-        #
-        # split = ShuffleSplit(N,1, train_size=self.training, test_size=None)
-        # for a, b in split:
-        #     train_indices = a
-        #     validation_indices = b
 
-        # print
-        # print 'Database size            : %s'% (Console.BOLD + Console.OKBLUE + str(N) + Console.ENDC)
-        # print 'Training dataset size    : %s'%Console.OKBLUE + str(len(train_indices)) + Console.ENDC
-        # print 'Validation dataset size  : %s'%Console.OKBLUE + str(len(validation_indices)) + Console.ENDC
-        # print
-        #
-        # assert len(train_indices) + len(validation_indices) == N, "The dataset was not splitted adequately"
-        #
-        # training_txt = self.locations.TRAINING_TXT%DS_DIR
-        #
-        # self.locations.check_dir_of(training_txt)
-        #
-        # with open(training_txt,'wb') as training_file:
-        #     writer = csv.writer(training_file, delimiter=';')
-        #     for idx in train_indices:
-        #         writer.writerow([map[idx][0], map[idx][1]])
-        #
-        # print training_txt + ' has been written'
-        #
-        #
-        # validation_txt = self.locations.VALIDATION_TXT%DS_DIR
-        # with open(validation_txt,'wb') as validation_file:
-        #     writer = csv.writer(validation_file, delimiter=';')
-        #     for idx in validation_indices:
-        #         writer.writerow([map[idx][0], map[idx][1]])
-        #
-        # print validation_txt + ' has been written'
-        # print
+    def _write_files(self, training_patches, validation_patches, DATASET_DIR):
 
-        self._write_files(training_patches, validation_patches, DS_DIR)
+        self.locations.check_dir_of(self.config.TRAINING_FILE)
 
-        self._compute_average(DS_DIR)
-
-    def _write_files(self, training_patches, validation_patches, DS_DIR):
-
-        training_txt = self.locations.TRAINING_TXT%DS_DIR
-
-        self.locations.check_dir_of(training_txt)
-
-        with open(training_txt,'wb') as training_file:
+        with open(self.config.TRAINING_FILE,'wb') as training_file:
             writer = csv.writer(training_file, delimiter=';')
             for idx in training_patches:
                 writer.writerow([idx[0], idx[1]])
 
-        print training_txt + ' has been written'
+        print self.config.TRAINING_FILE + ' has been written'
 
-
-        validation_txt = self.locations.VALIDATION_TXT%DS_DIR
-        with open(validation_txt,'wb') as validation_file:
+        with open(self.config.VALIDATION_FILE,'wb') as validation_file:
             writer = csv.writer(validation_file, delimiter=';')
             for idx in validation_patches:
                 writer.writerow([idx[0], idx[1]])
 
-        print validation_txt + ' has been written'
+        print self.config.VALIDATION_FILE + ' has been written'
         print
 
     def _compute_average(self, DS_DIR):
 
-        training_txt = self.locations.TRAINING_TXT%DS_DIR
-        with open(training_txt,'r') as training_file:
+        with open(self.config.TRAINING_FILE,'r') as training_file:
 
             pairs = training_file.read().splitlines()
             N = len(pairs)
@@ -216,18 +180,15 @@ class DatasetCreator:
             mean_image = None
             mean_all = np.array([0, 0, 0])
 
-            DATA_DIR = self.locations.PATCHES_DIR + '/' + DS_DIR
-
             for p in pairs:
                 source, target = p.split(';')
-                im = np.array(Image.open(DATA_DIR + '/' + source))
+                im = np.array(Image.open(self.config.PATCH_DIR + '/' + source))
 
                 avg_r = im[:,:,0].mean()
                 avg_g = im[:,:,1].mean()
                 avg_b = im[:,:,2].mean()
                 mean_im = np.array([avg_r, avg_b, avg_b], dtype=np.int)
                 mean_all += mean_im
-
 
                 if mean_image is None:
                     mean_image = np.copy(im).astype(np.int64)
@@ -244,11 +205,8 @@ class DatasetCreator:
             plt.imshow(mean_image,interpolation='None')
             plt.show()
 
-
-            training_avg_img_file = self.locations.TRAINING_AVG_IMAGE%DS_DIR
-
-            Image.fromarray(mean_image,'RGB').save(training_avg_img_file)
-            print 'Mean image saved to %s'%training_avg_img_file
+            Image.fromarray(mean_image,'RGB').save(self.config.TRAINING_AVERAGE_IMAGE)
+            print 'Mean image saved to %s'%self.config.TRAINING_AVERAGE_IMAGE
 
 
             print
@@ -258,13 +216,8 @@ class DatasetCreator:
             print 'Average Value: %s'%mean_all
             print '-----------------------------'
 
-            training_avg_file = self.locations.TRAINING_AVERAGE%DS_DIR
-
-            with open(training_avg_file,'w') as avg_file:
+            with open(self.config.TRAINING_AVERAGE_VALUE,'w') as avg_file:
                 avg_file.write('%s'%mean_all)
-            print 'Average value saved to %s'%training_avg_file
-
-
-
+            print 'Average value saved to %s'%self.config.TRAINING_AVERAGE_VALUE
 
 

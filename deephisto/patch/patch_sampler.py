@@ -1,3 +1,10 @@
+#  This file makes part of DEEP HISTO
+#
+#  Deep Histo is a medical imaging project that uses deep learning to
+#  predict histological features from MRI.
+#
+#  Author: Diego Cantor
+
 import random
 
 import numpy as np
@@ -38,7 +45,9 @@ class PatchSampler:
         self.WSIZE = wsize
         self.WSIDE = self.WSIZE / 2
         self.callback = callback
-
+        self.mask = None
+        self.coords = None
+        self.L = None
         self.factory = {
             PatchSampler.TYPE_MONTECARLO: self.montecarlo_sampling,
             PatchSampler.TYPE_OVERLAP   : self.overlap_sampling,
@@ -47,7 +56,7 @@ class PatchSampler:
             PatchSampler.TYPE_BACKGROUND: self.background_sampling
         }
 
-        if mask == None:
+        if mask is None:
             print Console.HEADER + ' Warning: the mask for the sampler is not set yet. Use set_mask before calling sample()' + Console.ENDC
         else:
             self.set_mask(mask)
@@ -114,31 +123,31 @@ class PatchSampler:
         return False
 
     def sample(self):
-        """
-        :param type: type of sampling
-        :param callback: function to callback when a match is found (need to receive x,y coordinates)
-        """
-        type = self.type
+        _type = self.type
         params = self.params
         callback = self.callback
-        method = self.factory.get(type, self.overlap_sampling)
+        method = self.factory.get(_type, self.overlap_sampling)
 
         print '\n\nInitiating sampling'
         print '-------------------------------'
-        print 'Type               : ' + Console.BOLD + type + Console.ENDC
+        print 'Type               : ' + Console.BOLD + _type + Console.ENDC
         print 'Window size        : %d' % self.WSIZE
         print 'Candidate list size: %d' % self.L
 
         return method(params, callback)
 
     def montecarlo_sampling(self, params, callback):
+        """
+            Parameters:
+                 coverage : percentage of pixels in the mask covered (one window per pixel)
+        """
 
-        if params == None:
+        if params is None:
             params = {}
         C = float(params.get('coverage', 0.5))
-        edges_flag = params.get('edges', False)
-        xrows = params.get('xrows', 0)
-        xcols = params.get('xcols', 0)
+        # edges_flag = params.get('edges', False)
+        # xrows = params.get('xrows', 0)
+        # xcols = params.get('xcols', 0)
 
         print 'Coverage           : %.1f' % (C * 100)
         N = int(self.L * C)
@@ -162,10 +171,16 @@ class PatchSampler:
         return selected
 
     def overlap_sampling(self, params, callback):
+        """
+            Parameters:
+                edges   : if True, uses the xrows and xcols
+                xrows   : number of extra rows sampled
+                xcols   : number of extra columns sampled
+        """
 
         selected = []
 
-        if params == None:
+        if params is None:
             params = {}
 
         edges_flag = params.get('edges', False)
@@ -188,8 +203,8 @@ class PatchSampler:
 
         print 'One moment please ....'
 
-        while (row <= height and col <= width):
-            while (col < width):
+        while row <= height and col <= width:
+            while col < width:
 
                 if (row, col) in self.coords:
                     selected.append((row, col))
@@ -209,10 +224,17 @@ class PatchSampler:
         return selected
 
     def overlap_sampling(self, params, callback):
+        """
+        Parameters:
+             edges : if True uses xrows and xcols
+             xrows : number of extra rows
+             xcols : number of extra columns
+             overlap_factor : divisor of the patch size
+        """
 
         selected = []
 
-        if params == None:
+        if params is None:
             params = {}
 
         edges_flag = params.get('edges', False)
@@ -235,8 +257,8 @@ class PatchSampler:
 
         print 'One moment please ....'
 
-        while (row <= height and col <= width):
-            while (col < width):
+        while row <= height and col <= width:
+            while col < width:
 
                 if (row, col) in self.coords:
                     selected.append((row, col))
@@ -256,10 +278,16 @@ class PatchSampler:
         return selected
 
     def background_sampling(self, params, callback):
+        """
+            Parameters:
+                 xmax   : maximum distance in pixels away from the mask (x direction)
+                 ymax   : maximum distance in pixels away from the mask (y direction)
+                 overlap_factor : divisor of the patch/window size
+        """
 
         selected = []
 
-        if params == None:
+        if params is None:
             params = {}
 
         xmax = params.get('xmax', 2)
@@ -293,10 +321,14 @@ class PatchSampler:
         return selected
 
     def convex_sampling(self, params, callback):
+        """
+           Parameters:
+                overlap_factor : divisor of the patch/window size
+       """
 
         selected = []
 
-        if params == None:
+        if params is None:
             params = {}
 
         overlap_factor = params.get('overlap_factor', 2)
@@ -339,8 +371,8 @@ class PatchSampler:
 
         print 'One moment please ....'
 
-        while (row <= height and col <= width):
-            while (col < width):
+        while row <= height and col <= width:
+            while col < width:
                 selected.append((row, col))
                 col = col + STEP
             row = row + STEP

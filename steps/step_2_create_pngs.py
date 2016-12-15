@@ -48,8 +48,8 @@ def main():
     creating the PNG files and moving to the next step.
     """
 
-    #config = dh_read_config('/home/dcantor/projects/deephisto/code/config_neuronal_density.ini')
-    config = dh_read_config('/home/dcantor/projects/deephisto/code/config_field_fraction.ini')
+    config = dh_read_config('/home/dcantor/projects/deephisto/code/config_neuronal_density.ini')
+    #config = dh_read_config('/home/dcantor/projects/deephisto/code/config_field_fraction.ini')
 
     subjects = dh_load_subjects(config)
     utils = ImageUtils(config)

@@ -27,8 +27,6 @@ def dh_unpack_annotations(config):
         utils.set_subject(s)
         utils.unpack_annotations()
 
-
-
 def main():
     #config = dh_read_config('/home/dcantor/projects/deephisto/code/config_neuronal_density.ini')
     config = dh_read_config('/home/dcantor/projects/deephisto/code/config_field_fraction.ini')

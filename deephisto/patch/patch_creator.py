@@ -1,120 +1,121 @@
+#  This file makes part of DEEP HISTO
+#
+#  Deep Histo is a medical imaging project that uses deep learning to
+#  predict histological features from MRI.
+#
+#  Author: Diego Cantor
+
 import os
 import shutil
 
 import Image
 import numpy as np
 
-from deephisto.utils import  Console
+from deephisto.utils import Console
 
 
 class PatchCreator:
 
-    def __init__(self, utils, sampler,target_dir, cleardir=False):
+    def __init__(self, sampler, utils, config):
+        self.sampler = sampler
         self.utils = utils
+        self.config = config
+
         self.subject = None
         self.index = None
-        self.pimages = []
-        self.sampler = sampler
-        self.target_dir = target_dir
+        self.labels = None
+        self.inputs = []
+
 
     def clear_dir(self, cleardir):
+        """
+        :param cleardir: if True deletes the contents of the patch directory.
+        :return:
+        """
+        PATCH_DIR = self.config.PATCH_DIR
 
-        data_dir = self.utils.locations.PATCHES_DIR + '/' + self.target_dir
-        if not os.path.exists(data_dir):
-            os.makedirs(data_dir)
-            print 'Creating directory %s' % data_dir
+        if not os.path.exists(PATCH_DIR):
+            os.makedirs(PATCH_DIR)
+            print 'Creating directory %s' % PATCH_DIR
         else:
             #  Empty directory first
-            if (cleardir):
-                print Console.WARNING + data_dir + ' exists. Emptying the patches directory [%s] before creating new patches' % self.target_dir + Console.ENDC
-                shutil.rmtree(data_dir)
-                os.makedirs(data_dir)
+            if cleardir:
+                print Console.WARNING + PATCH_DIR + ' exists. Emptying the patches directory [%s] before creating new patches' % PATCH_DIR + Console.ENDC
+                shutil.rmtree(PATCH_DIR)
+                os.makedirs(PATCH_DIR)
 
-    def create_patches(self, subject, index ): #,coverage=30):
+
+    def create_patches(self, subject, index):
         """
         :param subject:    The subject
         :param index:       The current slice
-        :return:
         """
-
         self.subject = subject
         self.index   = index
         self.utils.set_subject(subject)
-
-        utils = self.utils
+        self.inputs = []
+        self.labels = None
 
         bmask = self.utils.load_binary_mask_for_slice(index)
         self.sampler.set_mask(bmask)
 
-        self.pimages = []
-
         images = self.utils.load_sources_for_slice(index)
         for j in images:
-            self.pimages.append(Image.fromarray(j))
+            self.inputs.append(Image.fromarray(j))  # converts the numpy arrays to PIL images. Used for cropping
 
-        histo = self.utils.load_labels_for_slice(index)
-        self.pimages.append(Image.fromarray(histo))
+        self.labels = Image.fromarray(self.utils.load_labels_for_slice(index))
+
         print
         print 'Sampling subject %s, slice %d'%(self.subject, self.index)
 
         selected = self.sampler.sample()
 
         count = 0
-        for (y,x) in selected:   #first dimension is row (y), second is column (x). results of the sampler in image convention (numpy)
-            count = count  + self._extract_patch(x,y) # continue processing in cartesian convention
+
+        for (y,x) in selected:
+            # first dimension is row (y), second is column (x). results of the sampler in numpy convention (numpy)
+            count = count  + self.create_patch_files(x, y)  # continue processing in cartesian coords
 
         print '-----------------------------------------------------------'
         print Console.OKBLUE + Console.BOLD + '%d'%count + Console.ENDC + ' png images were created'
         print '-----------------------------------------------------------'
 
-    def _extract_patch(self, x, y):
+    def create_patch_files(self, x, y):
         """
         x,y: cartesian coordinates of the center of the patch that needs to be extracted
         """
-
-
-        filename = self.utils.locations.PATCH_TEMPLATE
-
-        L = len(self.pimages)-1
-
-        samples = []
         WSIDE = self.sampler.WSIDE
-        WSIZE = self.sampler.WSIZE
+        PATCH_TEMPLATE = self.config.PATCH_TEMPLATE
 
-        for i in range(L):
-            label = self.utils.locations.LABELS[i]
-            image = self.pimages[i]
+        channels = []
+        for i in range(len(self.inputs)):
+            image = self.inputs[i]
+            input_patch = image.crop((x - WSIDE, y - WSIDE, x + WSIDE, y + WSIDE))
+            channels.append(np.array(input_patch))
 
+        self.save_input_patch(channels, x, y)
 
+        filename = PATCH_TEMPLATE.format(subject=self.subject, index=self.index, type='L', x=x, y=y)
+        labels_patch = self.labels.crop((x - WSIDE, y - WSIDE, x + WSIDE, y + WSIDE))
+        labels_patch.save(filename)
+        return 2 # two patches are created
 
-            cimage = image.crop((x - WSIDE, y -WSIDE, x + WSIDE, y + WSIDE))
-            #cimage.save(filename%(self.subject, self.index, label, x, y))  not saving intermediate images
-            samples.append(np.array(cimage))
+    def save_input_patch(self, channels, x, y):
+        """
+        Creates the input patch. The order of the channels determines the RGB color
+        """
 
-        self.save_multi_channel_image(samples, x, y)
+        PATCH_TEMPLATE = self.config.PATCH_TEMPLATE
 
-        image = self.pimages[-1]  #  the histology image
-
-        cimage = image.crop((x - WSIDE, y - WSIDE, x + WSIDE, y + WSIDE))
-        cimage.save(filename%(self.target_dir, self.subject, self.index, 'HI', x,y))
-
-
-
-        return 2 #only count the MU and the HI PATCHES
-
-    def save_multi_channel_image(self, samples, x, y):
-
-        N = len(samples)
-        first = samples[0]
+        N = len(channels)
+        first = channels[0]
         (width, height, _) = first.shape
-        multi = np.zeros((width,height,N),'uint8')
+        multi = np.zeros((width, height, N), dtype='uint8')
         for i in range(N):
-            multi[...,i] =  samples[i][...,0]
-
+            multi[...,i] =  channels[i][..., 0]
         img = Image.fromarray(multi)
-
-        filename = self.utils.locations.PATCH_TEMPLATE
-        img.save(filename%(self.target_dir, self.subject, self.index,'MU',x,y))
+        filename = PATCH_TEMPLATE.format(subject=self.subject, index=self.index, type='I', x=x, y=y)
+        img.save(filename)
 
 
 

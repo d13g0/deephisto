@@ -40,27 +40,27 @@ class SliceButtonCallback(object):
 class ImageSetHelper:
     def load(self, utils, indices):
 
-        self.mask_set = []
+        self.mask_set    = []
         self.sources_set = []
-        self.label_set = []  # contains the real intensities
-        self.pimage_set = []  # used for cropping with PIL
+        self.label_set   = []
+        self.pil_images  = []  # used for cropping with PIL
 
         print 'Loading Image Set'
         for index in indices:
-            mask = utils.load_mask_for_slice(index)
+            mask    = utils.load_mask_for_slice(index)
             sources = utils.load_sources_for_slice(index)
-            label = utils.load_labels_for_slice(index)
+            label   = utils.load_labels_for_slice(index)
 
             self.mask_set.append(mask)
             self.sources_set.append(sources)
             self.label_set.append(label)
 
             pimages = []
-            for j in sources:
-                pimages.append(Image.fromarray(j))
+            for source in sources:
+                pimages.append(Image.fromarray(source))
             pimages.append(Image.fromarray(label))
 
-            self.pimage_set.append(pimages)
+            self.pil_images.append(pimages)
 
         print 'Image Set Loaded'
 
@@ -139,7 +139,7 @@ class Visualizer:
         self.config = config
         self.colormap = config.visualizer.COLORMAP
         self.fig = None
-        self.pimages = []
+        self.pil_images = []
         self.drs = []
         self.axs = []
         self.bxs = []
@@ -185,7 +185,7 @@ class Visualizer:
             plt.close(self.fig)
             self.fig = None
 
-        self.pimages = []
+        self.pil_images = []
         self.drs = []
         self.axs = []
         self.bxs = []
@@ -227,8 +227,8 @@ class Visualizer:
         self.images = self.image_helper.sources_set[idx]
         self.histo = self.image_helper.label_set[idx]
         self.histo_flat = self.histo[:, :, 0]  # to show with color maps
-        self.pimages = self.image_helper.pimage_set[idx]
-        self.num_sources = len(self.pimages)
+        self.pil_images = self.image_helper.pil_images[idx]
+        self.num_sources = len(self.pil_images)
 
     def next_slice(self):
         indices = self.indices
@@ -361,7 +361,7 @@ class Visualizer:
         L = self.num_sources - 1  # all sources but histo image (which is the last in the images list
 
         for i in range(L):
-            pimage = self.pimages[i]
+            pimage = self.pil_images[i]
             cimage = pimage.crop(
                     (x - self.WSIDE, y - self.WSIDE, x + self.WSIDE, y + self.WSIDE))
             self.bxs[i].imshow(cimage, interpolation='none')

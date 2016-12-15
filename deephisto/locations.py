@@ -19,7 +19,6 @@ class FormatDict(dict):
 
 class Locations:
     def __init__(self, config):
-
         self.config = config
         self.subject = None
         self.SOURCE_PNG = None
@@ -30,29 +29,11 @@ class Locations:
         self.MASK_DIR = None
         self.ANNOTATIONS_ZIP = None
 
-        # self.ROOT_DIR = root
-        # self.ANNOTATIONS_DIR = None
-        # self.ANNOTATIONS_ZIP = None
-        # self.MASK_DIR = None
-        # self.exv_dir = None
-        # self.exv_FA = None
-        # self.exv_MD = None
-        # self.exv_MRI = None
-        # self.SOURCES = None
-        # self.LABELS = None
-        # self.HIST_DIR = None
-        # self.HIST_FMAP = None
-        # self.IMAGES_DIR = None
-        # self.SOURCE_PNG = None
-        # self.HISTO_PNG = None
-        #
-        # if self.ROOT_DIR[-1] != '/':
-        #     self.ROOT_DIR = self.ROOT_DIR + '/'
-        #
+
+
         # self.MOVIE_DIR   = self.ROOT_DIR + 'movies'
         #
-        # self.PATCHES_DIR = self.ROOT_DIR + 'patches'
-        # self.PATCH_TEMPLATE = self.PATCHES_DIR + '/%s/P_%s_%d_%s_%d_%d.png'  # subject-slice-type-x-y.png
+
         #
         # self.CAFFE_WORKDIR = self.ROOT_DIR + 'caffe'
         # self.SPLIT_DIR = self.CAFFE_WORKDIR + '/split'
@@ -62,17 +43,6 @@ class Locations:
         # self.TRAINING_AVERAGE = self.SPLIT_DIR + '/%s/training_average.txt'
         # self.TRAINING_AVG_IMAGE = self.SPLIT_DIR + '/%s/training_avg.png'
         #
-        # if subject is not None:
-        #     self.SUBJECT_DIR = '/subjects/%s/' % subject
-        #     self.subject = subject
-        #     self.update()
-        # else:
-        #     self.subject = None
-
-    # def set_root_dir(self, root):
-    #     self.ROOT_DIR = root
-    #     self.update()
-
     @staticmethod
     def check_dir_of(path):
         if not os.path.exists(os.path.dirname(path)):
@@ -110,14 +80,17 @@ class Locations:
         self.SLICE_MASK_PNG = f(self.config.SLICE_MASK_PNG, subject=subject)
         self.ANNOTATIONS_ZIP = f(self.config.ANNOTATIONS_ZIP, subject=subject)
 
+
+        #------------------------------------------------------------------------------
+        # source inputs
         self.SOURCES = [
             f(self.config.local_files.MR, subject=subject),
             f(self.config.local_files.FA, subject=subject),
             f(self.config.local_files.MD, subject=subject)
         ]
 
-        self.TYPES = ['MRI', 'FA', 'MD']  #SAME ORDER AS IN SOURCES (MUST BE)
-
+        self.SOURCE_TYPES = ['MRI', 'FA', 'MD']  #SAME ORDER AS IN SOURCES (MUST BE)
+        # ------------------------------------------------------------------------------
 
 
     def check_png_directories(self):
@@ -170,35 +143,3 @@ class Locations:
         f = Locations.partial_formatter
         return f(self.HISTO_PNG,index=index)
 
-
-    def update(self):
-        pass
-
-        # if self.ROOT_DIR[-1] != '/':
-        #     self.ROOT_DIR = self.ROOT_DIR + '/'
-        #
-        # self.MOVIE_DIR = self.ROOT_DIR + 'movies'
-
-        #
-
-        #
-        # # -----------------------------------------------------------------------------
-        # #   Location of the histology feature maps
-        # # -----------------------------------------------------------------------------
-        # self.HIST_DIR = self.ROOT_DIR + self.SUBJECT_DIR + '/hist/'
-        # self.HIST_FMAP = self.HIST_DIR + 'count_deformable_100um.nii.gz'
-        #
-        # # -----------------------------------------------------------------------------
-        # #   Location of the resulting png images
-        # # -----------------------------------------------------------------------------
-        # self.IMAGES_DIR  = self.ROOT_DIR + self.SUBJECT_DIR + '/png/'
-        # self.SOURCE_PNG  = self.IMAGES_DIR + 'S_%s_%d.png'
-        # self.HISTO_PNG   = self.IMAGES_DIR + 'S_HI_%d.png'  # scaled histology used for annotations
-        # self.HISTO_PNG_U = self.IMAGES_DIR + 'S_HU_%d.png'  #unscaled histology used for processing
-        #
-        #
-        # # -----------------------------------------------------------------------------
-        # #   Location of the patches
-        # # -----------------------------------------------------------------------------
-        # self.PATCHES_DIR = self.ROOT_DIR + 'patches'
-        # self.PATCH_TEMPLATE = self.PATCHES_DIR + '/%s/P_%s_%d_%s_%d_%d.png'  # subject-slice-type-x-y.png

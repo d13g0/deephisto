@@ -1,3 +1,10 @@
+#  This file makes part of DEEP HISTO
+#
+#  Deep Histo is a medical imaging project that uses deep learning to
+#  predict histological features from MRI.
+#
+#  Author: Diego Cantor
+
 import pdb, re
 from ConfigParser import SafeConfigParser
 
@@ -7,16 +14,6 @@ class ObjectDict(dict):
             return self[name]
         else:
             raise AttributeError("No such attribute: " + name)
-
-    # def __setattr__(self, name, value):
-    #     self[name] = value
-    #
-    # def __delattr__(self, name):
-    #     if name in self:
-    #         del self[name]
-    #     else:
-    #         raise AttributeError("No such attribute: " + name)
-
 
 class Config:
     REMOTE_FILES_KEY = 'remote files'
@@ -104,10 +101,44 @@ class Config:
     def HISTOLOGY_RANGE_MAX(self):
         return float(self.data['histology']['range_max'])
 
+    @property
+    def PATCH_SIZE(self):
+        return int(self.data['patches']['patch_size'])
+
+    @property
+    def PATCH_DIR(self):
+        return self.data['patches']['patch_dir']
+
+    @property
+    def PATCH_TEMPLATE(self):
+        return self.data['patches']['patch_template']
+
+    @property
+    def TRAINING_PERCENTAGE(self):
+        return float(self.data['classification']['training_percentage'])
+
+    @property
+    def DATASET_DIR(self):
+        return self.data['classification']['dataset_dir']
+
+    @property
+    def TRAINING_FILE(self):
+        return self.data['classification']['training_file']
+
+    @property
+    def VALIDATION_FILE(self):
+        return self.data['classification']['validation_file']
+
+    @property
+    def TRAINING_AVERAGE_IMAGE(self):
+        return self.data['classification']['training_avg_image']
+
+    @property
+    def TRAINING_AVERAGE_VALUE(self):
+        return self.data['classification']['training_avg_value']
 
 
-
-def check_for_variables(parser):
+def _check_for_variables(parser):
     """
     Checks if there are unresolved variables
     """
@@ -119,7 +150,7 @@ def check_for_variables(parser):
     return False
 
 
-def search_and_replace(parser, section):
+def _search_and_replace(parser, section):
     """
     Replaces references to other configuration variables in the same file
     """
@@ -141,7 +172,7 @@ def search_and_replace(parser, section):
     return result
 
 
-def setup_config_object(parser):
+def _setup_config_object(parser):
     data = dict()
     data.update(parser._sections)
     config = Config(data)
@@ -159,7 +190,7 @@ def dh_read_config(filename):
 
     def iteration():
         for section in parser.sections():
-            results = search_and_replace(parser, section)
+            results = _search_and_replace(parser, section)
             for item in results:
                 key,value = item
                 parser.set(section,key,value)
@@ -169,14 +200,14 @@ def dh_read_config(filename):
     iteration()
     count = 0
     max_depth = 10
-    while check_for_variables(parser):
+    while _check_for_variables(parser):
         iteration()
         count = count  + 1
         if count == max_depth:
             raise Exception('There are undefined variables in the configuration file [%s]'%filename)
 
 
-    config = setup_config_object(parser)
+    config = _setup_config_object(parser)
     print 'Study %s'%config.STUDY_NAME
     print '-------------------------------'
     print
@@ -188,6 +219,3 @@ def dh_load_subjects(config):
         subjects.append('EPI_P%03d' % i)
     return subjects
 
-if __name__ == '__main__':
-    CONFIG = dh_read_config('/home/dcantor/projects/deephisto/code/config_neuronal_density.ini')
-    raw_input('Configuration file read. Congrats! Press any key to finish')
