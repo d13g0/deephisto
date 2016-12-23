@@ -308,7 +308,7 @@ class Visualizer:
             ax.imshow(images[i], interpolation='none')
             ax.imshow(mask, alpha=0.3)
             ax.get_xaxis().set_visible(False)
-            ax.set_ylabel(self.utils.locations.TYPES[i], fontsize=16, color='#cccccc', rotation=0)
+            ax.set_ylabel(self.utils.locations.SOURCE_TYPES[i], fontsize=16, color='#cccccc', rotation=0)
             ax.get_yaxis().set_ticks([])
 
             bx = self.fig.add_subplot(gs[A:B, 2:4])
