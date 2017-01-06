@@ -6,10 +6,9 @@ from scipy import stats
 import matplotlib.pylab as plt
 import matplotlib.patches as ppa
 from PIL import Image
-import caffe
+import net
 
 from deephisto import ImageUtils, Locations, PatchSampler
-from deephisto.caffe import CaffeSettings
 
 
 class NetTest:

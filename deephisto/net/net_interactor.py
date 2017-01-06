@@ -7,12 +7,12 @@ import sys, pdb
 import numpy as np
 from itertools import product
 import matplotlib.pyplot as plt
-import caffe
+import net
 from PIL import Image
 from caffe_settings import CaffeSettings
 
 
-# Making sure that this file is visible to caffe
+# Making sure that this file is visible to net
 sys.path.insert(0, CaffeSettings.CAFFE_CODE_DIR)
 
 class NetInteractor:
@@ -85,7 +85,7 @@ class NetInteractor:
 
     def load_model(self, directory, epoch, data_dir):
         """
-        :param directory: The directory where the caffe trained .caffemodels exist
+        :param directory: The directory where the net trained .caffemodels exist
         :param epoch:  the index X of the file __iter__X__.caffemodel to be used
         :param data_dir: location under SPLIT_DIR and PATCH_DIR to look for data (must be the same name)
         """
@@ -98,7 +98,7 @@ class NetInteractor:
         self.load_avg_image()
         self.load_lists()
 
-        #loads the  caffe network (deploy.prototxt) with the respective weights
+        #loads the  net network (deploy.prototxt) with the respective weights
         #ready to make predictions
         weights = CaffeSettings.SNAPSHOT_DIR % (directory, epoch)
         model = CaffeSettings.NET_DIR + '/' + directory + '/' + CaffeSettings.DEPLOY_PROTO

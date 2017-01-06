@@ -122,12 +122,12 @@ class Config:
         return self.data['classification']['dataset_dir']
 
     @property
-    def TRAINING_FILE(self):
-        return self.data['classification']['training_file']
+    def TRAINING_PATCHES(self):
+        return self.data['classification']['training_patches']
 
     @property
-    def VALIDATION_FILE(self):
-        return self.data['classification']['validation_file']
+    def VALIDATION_PATCHES(self):
+        return self.data['classification']['validation_patches']
 
     @property
     def TRAINING_AVERAGE_IMAGE(self):
@@ -136,6 +136,37 @@ class Config:
     @property
     def TRAINING_AVERAGE_VALUE(self):
         return self.data['classification']['training_avg_value']
+
+    @property
+    def NETWORK_NAME(self):
+        return self.data['network']['name']
+
+    @property
+    def NETWORK_DIR(self):
+        return self.data['network']['network_dir']
+
+    @property
+    def TRAINING_PROTO(self):
+        return self.data['network']['training_proto']
+    @property
+    def VALIDATION_PROTO(self):
+        return self.data['network']['validation_proto']
+
+    @property
+    def DEPLOY_PROTO(self):
+        return self.data['network']['deploy_proto']
+
+    @property
+    def RANDOM_TRAINING(self):
+        return self.data['network']['random_training'] in ['true', '1', 't', 'y', 'yes', 'yeah', 'yup',
+                                                                 'certainly', 'uh-huh']
+
+    @property
+    def INCLUDE_ROTATIONS(self):
+        return self.data['network']['include_rotations'] in ['true', '1', 't', 'y', 'yes', 'yeah', 'yup',
+                                                                 'certainly', 'uh-huh']
+
+
 
 
 def _check_for_variables(parser):

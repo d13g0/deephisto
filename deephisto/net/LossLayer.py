@@ -2,13 +2,13 @@ import pdb
 import itertools
 import numpy as np
 import matplotlib.pylab as plt
-import caffe
+import net
 import math
 
-from caffe._caffe import layer_type_list
+from net._caffe import layer_type_list
 
 
-class TopoLossLayer(caffe.Layer):
+class TopoLossLayer(net.Layer):
     def setup(self, bottom, top):
         if len(bottom) != 2:
             raise Exception('We need two inputs to compute loss')
@@ -81,7 +81,7 @@ class TopoLossLayer(caffe.Layer):
     def backward(self, top, propagate_down, bottom):
         """
         backward is never called during testing:
-        (i.e. caffe test --model=net/dhloss/val.prototxt -- weights=data/dh28s/_iter_300000.caffemodel)
+        (i.e. net test --model=net/dhloss/val.prototxt -- weights=data/dh28s/_iter_300000.caffemodel)
         """
         assert propagate_down[1] != True, 'gradients cannot be calculated with respect to the label inputs'
 

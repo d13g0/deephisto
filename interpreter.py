@@ -6,7 +6,7 @@ import matplotlib.pylab as plt
 import multiprocessing as mlt
 
 from deephisto import Locations, Console
-from deephisto.caffe import NetInteractor, NetTest
+from deephisto.net import NetInteractor, NetTest
 
 
 class Interpreter(cmd.Cmd):

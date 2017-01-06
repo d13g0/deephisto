@@ -35,7 +35,7 @@ class Locations:
         #
 
         #
-        # self.CAFFE_WORKDIR = self.ROOT_DIR + 'caffe'
+        # self.CAFFE_WORKDIR = self.ROOT_DIR + 'net'
         # self.SPLIT_DIR = self.CAFFE_WORKDIR + '/split'
         #
         # self.TRAINING_TXT = self.SPLIT_DIR + '/%s/training.txt'

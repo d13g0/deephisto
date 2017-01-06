@@ -52,7 +52,7 @@ class DatasetCreator:
         dict ={}
 
         for s in sources:
-            # @TODO (hardcode) if patch_template in [patches] change, this code is affected
+            # @TODO (hardcode) if patch_template in configuration [patches] change, this code is affected
             _,_,P,slice,x,y = s.split('_') #{type}_{subject}_{index}_{x}_{y}.png
             subject = 'EPI_%s'%P
             y,_ = y.split('.')
@@ -148,26 +148,26 @@ class DatasetCreator:
 
     def _write_files(self, training_patches, validation_patches, DATASET_DIR):
 
-        self.locations.check_dir_of(self.config.TRAINING_FILE)
+        self.locations.check_dir_of(self.config.TRAINING_PATCHES)
 
-        with open(self.config.TRAINING_FILE,'wb') as training_file:
+        with open(self.config.TRAINING_PATCHES, 'wb') as training_file:
             writer = csv.writer(training_file, delimiter=';')
             for idx in training_patches:
                 writer.writerow([idx[0], idx[1]])
 
-        print self.config.TRAINING_FILE + ' has been written'
+        print self.config.TRAINING_PATCHES + ' has been written'
 
-        with open(self.config.VALIDATION_FILE,'wb') as validation_file:
+        with open(self.config.VALIDATION_PATCHES, 'wb') as validation_file:
             writer = csv.writer(validation_file, delimiter=';')
             for idx in validation_patches:
                 writer.writerow([idx[0], idx[1]])
 
-        print self.config.VALIDATION_FILE + ' has been written'
+        print self.config.VALIDATION_PATCHES + ' has been written'
         print
 
     def _compute_average(self, DS_DIR):
 
-        with open(self.config.TRAINING_FILE,'r') as training_file:
+        with open(self.config.TRAINING_PATCHES, 'r') as training_file:
 
             pairs = training_file.read().splitlines()
             N = len(pairs)
