@@ -72,7 +72,7 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="DataLayer.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="DataLayer.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/deephisto/net/DataLayer.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="322">
@@ -80,6 +80,16 @@
               <folding>
                 <element signature="e#180#198#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="step_2_create_pngs.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/steps/step_2_create_pngs.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="361">
+              <caret line="57" column="118" selection-start-line="57" selection-start-column="118" selection-end-line="57" selection-end-column="118" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -181,7 +191,6 @@
         <option value="$PROJECT_DIR$/steps/step_1_download_nifti_files.py" />
         <option value="$PROJECT_DIR$/deephisto/patch/patch_sampler.py" />
         <option value="$PROJECT_DIR$/deephisto/patch/patch_creator.py" />
-        <option value="$PROJECT_DIR$/steps/step_2_create_pngs.py" />
         <option value="$PROJECT_DIR$/steps/step_4_visual_inspection.py" />
         <option value="$PROJECT_DIR$/steps/step_3_unpack_annotations.py" />
         <option value="$PROJECT_DIR$/deephisto/locations.py" />
@@ -212,6 +221,7 @@
         <option value="$PROJECT_DIR$/config_neuronal_density.ini" />
         <option value="$PROJECT_DIR$/steps/step_7_create_network.py" />
         <option value="$PROJECT_DIR$/deephisto/net/DataLayer.py" />
+        <option value="$PROJECT_DIR$/steps/step_2_create_pngs.py" />
       </list>
     </option>
   </component>
@@ -1109,13 +1119,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/steps/step_2_create_pngs.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1080">
-          <caret line="60" column="63" selection-start-line="58" selection-start-column="4" selection-end-line="60" selection-end-column="63" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/steps/step_1_download_nifti_files.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -1365,6 +1368,14 @@
           <folding>
             <element signature="e#180#198#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/steps/step_2_create_pngs.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="361">
+          <caret line="57" column="118" selection-start-line="57" selection-start-column="118" selection-end-line="57" selection-end-column="118" />
+          <folding />
         </state>
       </provider>
     </entry>
