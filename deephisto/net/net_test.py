@@ -6,7 +6,7 @@ from scipy import stats
 import matplotlib.pylab as plt
 import matplotlib.patches as ppa
 from PIL import Image
-import net
+import caffe
 
 from deephisto import ImageUtils, Locations, PatchSampler
 

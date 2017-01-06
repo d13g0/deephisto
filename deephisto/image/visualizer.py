@@ -18,10 +18,11 @@ from matplotlib import gridspec
 import Image
 import Tkinter as Tk
 
-from image import ImageUtils
-from utils import DraggableRectangle
-
 from deephisto import Locations
+from deephisto.image import ImageUtils
+from deephisto.utils import DraggableRectangle
+
+
 
 
 class SliceButtonCallback(object):

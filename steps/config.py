@@ -5,7 +5,7 @@
 #
 #  Author: Diego Cantor
 
-import pdb, re
+import pdb, re, argparse
 from ConfigParser import SafeConfigParser
 
 class ObjectDict(dict):
@@ -250,3 +250,9 @@ def dh_load_subjects(config):
         subjects.append('EPI_P%03d' % i)
     return subjects
 
+
+def dh_config_selector():
+    parser = argparse.ArgumentParser(description='Select a configuration file')
+    parser.add_argument('-c', action='store', dest='configuration_file', required=True)
+    results=parser.parse_args()
+    return dh_read_config(results.configuration_file)

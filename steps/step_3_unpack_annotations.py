@@ -6,7 +6,7 @@
 #  Author: Diego Cantor
 
 from config import dh_load_subjects, dh_read_config
-from deephisto import ImageUtils, Locations
+from deephisto import ImageUtils
 
 
 def dh_unpack_annotations(config):

@@ -5,16 +5,19 @@ import cmd
 import matplotlib.pylab as plt
 import multiprocessing as mlt
 
+from steps.config import dh_config_selector
 from deephisto import Locations, Console
 from deephisto.net import NetInteractor, NetTest
 
 
 class Interpreter(cmd.Cmd):
-    def __init__(self, locations):
+
+    def __init__(self, config):
         cmd.Cmd.__init__(self)
-        self.locations = locations
-        self.obs = NetInteractor()
-        self.net_test = NetTest(locations)
+        self.config = config
+        self.locations = Locations(config)
+        self.obs = NetInteractor(config)
+        self.net_test = NetTest(self.locations)
         self.data_dir = None
 
     prompt = '>> '
@@ -67,26 +70,27 @@ class Interpreter(cmd.Cmd):
         print '------------------------------------------------------------------------------'
 
     def do_data(self, args):
-        """Sets the data source for the network"""
+        """Sets the data source for the network. Look for directories under <project>/patches"""
         if (len(args.split()) != 1):
             print 'Wrong number of paramters. data [dir] expected.'
             return
+
         self.data_dir = args.split()[0]
 
-        dir = self.locations.PATCHES_DIR + '/' + self.data_dir
+        dir = os.path.join(os.path.dirname(self.config.PATCH_DIR),self.data_dir)
+
         if not os.path.exists(dir):
             print Console.WARNING + '%s does not exist'%self.data_dir + Console.ENDC
             return
-        dir = self.locations.PATCHES_DIR + '/' + self.data_dir
 
         if not os.path.exists(dir):
             print '%s does not exist'
             return
 
-        print 'data dir set to ' + Console.BOLD +'%s' % self.data_dir + Console.ENDC
+        print 'data dir set to ' + Console.BOLD +'%s' % dir + Console.ENDC
 
 
-        train, test = self.obs.load_lists(data_dir=self.data_dir)
+        train, test = self.obs.load_lists(patchdir_name=self.data_dir)
         print
         print 'size training set    :   %d'%len(train)
         print 'size validation set  :   %d'%len(test)
@@ -276,7 +280,7 @@ class Interpreter(cmd.Cmd):
 
 
 if __name__ == '__main__':
-    locations = Locations('/home/dcantor/projects/deephisto')
-    i = Interpreter(locations)
+    cfile = dh_config_selector()
+    i = Interpreter(cfile)
     i.do_man(None)
     i.cmdloop()

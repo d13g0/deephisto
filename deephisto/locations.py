@@ -29,20 +29,6 @@ class Locations:
         self.MASK_DIR = None
         self.ANNOTATIONS_ZIP = None
 
-
-
-        # self.MOVIE_DIR   = self.ROOT_DIR + 'movies'
-        #
-
-        #
-        # self.CAFFE_WORKDIR = self.ROOT_DIR + 'net'
-        # self.SPLIT_DIR = self.CAFFE_WORKDIR + '/split'
-        #
-        # self.TRAINING_TXT = self.SPLIT_DIR + '/%s/training.txt'
-        # self.VALIDATION_TXT = self.SPLIT_DIR + '/%s/validation.txt'
-        # self.TRAINING_AVERAGE = self.SPLIT_DIR + '/%s/training_average.txt'
-        # self.TRAINING_AVG_IMAGE = self.SPLIT_DIR + '/%s/training_avg.png'
-        #
     @staticmethod
     def check_dir_of(path):
         if not os.path.exists(os.path.dirname(path)):
