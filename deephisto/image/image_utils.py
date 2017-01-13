@@ -268,25 +268,23 @@ class ImageUtils:
 
 
     def unpack_annotations(self):
-        print self.locations.ANNOTATIONS_ZIP, self.locations.MASK_DIR
-        # @TODO: This code works. Uncomment
-        # url = self.locations.ANNOTATIONS_ZIP
-        # try:
-        #     shutil.rmtree(self.locations.MASK_DIR)
-        # except OSError as e:
-        #     if e.errno == errno.ENOENT:
-        #         pass
-        #
-        # os.makedirs(self.locations.MASK_DIR)
-        #
-        # try:
-        #     zipf = zipfile.ZipFile(url)
-        #     zipf.extractall(self.locations.MASK_DIR)
-        #     print Console.OKBLUE + 'All annotations have been extracted for %s'%self.subject + Console.ENDC
-        # except IOError as e:
-        #     if e.errno != errno.ENOENT: raise e
-        #     else:
-        #         print 'No annotations yet for %s'%self.subject
+        url = self.locations.ANNOTATIONS_ZIP
+        try:
+            shutil.rmtree(self.locations.MASK_DIR)
+        except OSError as e:
+            if e.errno == errno.ENOENT:
+                pass
+
+        os.makedirs(self.locations.MASK_DIR)
+
+        try:
+            zipf = zipfile.ZipFile(url)
+            zipf.extractall(self.locations.MASK_DIR)
+            print Console.OKBLUE + 'All annotations have been extracted for %s'%self.subject + Console.ENDC
+        except IOError as e:
+            if e.errno != errno.ENOENT: raise e
+            else:
+                print 'No annotations yet for %s'%self.subject
 
   
     def load_mask_for_slice(self, index):
