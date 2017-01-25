@@ -1,0 +1,57 @@
+# ---------------------------------
+# Neuronal Density Solver
+# ---------------------------------
+# solver on whole dataset
+
+#Solver mode
+#------------------
+solver_mode: GPU
+
+#Networks
+#------------------
+train_net: "net/ff/training.prototxt"
+test_net: "net/ff/validation.prototxt"
+
+#learning rate decay policy
+#------------------
+lr_policy: "fixed"
+base_lr: 1e-6
+momentum: 0.8
+weight_decay: 0.0005
+
+
+#When to test
+#------------------
+test_iter: 10
+test_interval: 999999
+test_initialization: false
+
+
+# When to learn
+#------------------
+iter_size: 1
+
+max_iter: 1800000
+display: 500  
+snapshot: 5000
+
+snapshot_prefix: "/data/dcantor/deephisto/ff/"
+average_loss: 20
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

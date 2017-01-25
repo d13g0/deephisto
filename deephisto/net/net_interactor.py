@@ -45,6 +45,8 @@ class NetInteractor:
         self.PANEL_ROWS = 5
         self.PANEL_COLS = 4
         self.verbose = True
+        self.training_subjects = None
+        self.validation_subjects = None
 
     def load_lists(self, patchdir_name=None):
 
