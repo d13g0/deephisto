@@ -1,4 +1,4 @@
-import os
+import os, pdb
 
 os.environ['GLOG_minloglevel'] = '2'
 import cmd
@@ -15,10 +15,11 @@ class Interpreter(cmd.Cmd):
     def __init__(self, config):
         cmd.Cmd.__init__(self)
         self.config = config
-        self.locations = Locations(config)
-        self.obs = NetInteractor(config)
-        self.net_test = NetTest(self.locations)
-        self.data_dir = None
+        #self.locations = Locations(config)
+        self.net_interactor = NetInteractor(config)
+        self.net_test = NetTest(config)
+        self.patch_dir = None
+        self.dataset_dir = None
 
     prompt = '>> '
     ruler = '-'
@@ -34,82 +35,138 @@ class Interpreter(cmd.Cmd):
         print "You can also use the Ctrl-D shortcut."
 
     def do_man(self, line):
-        print 'Welcome to the network observer. Type ' + Console.BOLD + 'man' + Console.ENDC + ' to show this message'
+        print 'Welcome to Deep Histo. Type ' + Console.BOLD + 'man' + Console.ENDC + ' to show this message'
         print '------------------------------------------------------------------------------'
         print
         print ' Commands: '
         print
-        print '   data  [dir]                 : sets the data directory (where patches are)'
+        print Console.BOLD + '   Dataset' + Console.ENDC
         print
-        print '   Single patch:'
-        print '   ============='
-        print '   load [directory]  [epoch]   : loads a trained network'
-        print '   ping [patch]                : gets a random prediction from the validation set'
-        print '   net                         : shows the structure of the network'
+        print '   - dataset [dir]               : provides information about the current dataset. Sets the new dataset if the paramter [dir] is present'
         print
+        print Console.BOLD + '   Single patch' + Console.ENDC
         print
-        print '   Panel:'
-        print '   ======'
-        print '   peek [directory] [epoch]    : loads the panel for a given epoch'
-        print '   epoch [e]                   : sets the current epoch to e'
-        print '   rand                        : changes the data in the panel'
+        print '   - load [directory]  [epoch]   : loads a trained network'
+        print '   - ping [patch]                : gets a random prediction from the validation set'
+        print '   - net                         : shows the structure of the network'
         print
+        print Console.BOLD + '   Panel' + Console.ENDC
         print
-        print '   Animation:'
-        print '   =========='
-        print '   next                                     : next epoch   '
-        print '   play [directory] [start] [stop]  [step]  : sets up an animation of the net through its epochs'
+        print '   - peek [directory] [epoch]    : loads the panel for a given epoch'
+        print '   - epoch [e]                   : sets the current epoch to e'
+        print '   - rand                        : changes the data in the panel'
         print
+        print Console.BOLD + '   Animation' + Console.ENDC
         print
-        print '   Subject:'
-        print '   ========'
-        print '   run [subject] [slice] [avg|max|med|mod] : runs the network on this slice patcy-by-patch'
+        print '   - next                                     : next epoch   '
+        print '   - play [directory] [start] [stop]  [step]  : sets up an animation of the net through its epochs'
         print
-        print '   man                                     : shows this message                          '
-        print '   exit                                    : exits the interpreter'
+        print Console.BOLD + '   Subject' + Console.ENDC
+        print
+        print '   - run [subject] [slice] [avg|max|med|mod] : runs the network on this slice patcy-by-patch'
+        print
+        print '   - man                                     : shows this message                          '
+        print '   - exit                                    : exits the interpreter'
         print '------------------------------------------------------------------------------'
 
-    def do_data(self, args):
-        """Sets the data source for the network. Look for directories under <project>/patches"""
-        if (len(args.split()) != 1):
-            print 'Wrong number of paramters. data [dir] expected.'
-            return
-
-        self.data_dir = args.split()[0]
-
-        dir = os.path.join(os.path.dirname(self.config.PATCH_DIR),self.data_dir)
-
-        if not os.path.exists(dir):
-            print Console.WARNING + '%s does not exist'%self.data_dir + Console.ENDC
-            return
-
-        if not os.path.exists(dir):
-            print '%s does not exist'
-            return
-
-        print 'data dir set to ' + Console.BOLD +'%s' % dir + Console.ENDC
-
-
-        train, test = self.obs.load_lists(patchdir_name=self.data_dir)
+    def load_defaults_from_config(self):
+        self.patch_dir = self.config.PATCH_DIR
+        self.dataset_dir = self.config.DATASET_DIR
         print
-        print 'size training set    :   %d'%len(train)
-        print 'size validation set  :   %d'%len(test)
+        print 'Loading defaults from configuration file:'
+        self.show_dataset()
         print
+
+    def show_dataset(self):
+
+        print 'Patch   dir : ' + Console.BOLD + '%s' % self.patch_dir + Console.ENDC
+        print 'Dataset dir :'  + Console.BOLD + '%s' % self.dataset_dir + Console.ENDC
+
+
+        train, test = self.net_interactor.load_dataset_metadata(dataset_dir=self.dataset_dir)
+        print
+        print 'size training set    :   %d' % len(train)
+        print 'size validation set  :   %d' % len(test)
+        print
+        self.show_dataset_split(train,test)
+
+    def show_dataset_split(self, train, test):
+        """
+        WARNING
+        This method is hardcoded to the patch template under the
+        [patches] section in the configuration file. Changes
+        to the template will BREAK this method
+        """
+        train_set = set()
+        test_set = set()
+
+        for sample in train:
+            _,_,pid,slice_id,_,_ = sample.split('_')
+            slice = 'EPI_'+pid+'_'+slice_id
+            train_set.add(slice)
+
+        for sample in test:
+            _,_,pid,slice_id,_,_ = sample.split('_')
+            slice = 'EPI_'+pid+'_'+slice_id
+            test_set.add(slice)
+
+        train_set = sorted(train_set)
+        test_set = sorted(test_set)
+
+        print 'Slices in '+ Console.BOLD+'TRAINING'+ Console.ENDC+' set'
+        for item in train_set:
+            print item,
+
+        print
+        print
+        print 'Slices in '+ Console.BOLD+'TESTING'+ Console.ENDC+' set'
+        for item in test_set:
+            print item,
+        print
+        print
+
+    def do_dataset(self,args):
+        """
+        Displays information about the current dataset
+        """
+        if len(args.split()) == 0:
+            self.show_dataset()
+            return
+
+        dir = args.split()[0]
+        patch_dir = os.path.join(os.path.dirname(self.config.PATCH_DIR), dir)
+        dataset_dir = os.path.join(os.path.dirname(self.config.DATASET_DIR), dir)
+
+        if not os.path.exists(patch_dir):
+            print Console.WARNING + '%s does not exist'%patch_dir + Console.ENDC
+            return
+
+        if not os.path.exists(dataset_dir):
+            print Console.WARNING + '%s does not exist' % datset_dir + Console.ENDC
+            return
+
+        self.patch_dir = patch_dir
+        self.dataset_dir = dataset_dir
+        self.show_dataset()
+
+
+
+
+
+
+
 
     def do_load(self, args):
-        """load [directory] [epoch] : loads a network with the given epoch data"""
+        """
+        load [directory] [epoch] : loads a network with the given epoch data
+        """
         if (len(args.split()) != 2):
             print ' Wrong number of paramters. [directory] [epoch] expected.'
             return
 
         directory, epoch = args.split()
         epoch = int(epoch)
-
-        if self.data_dir == None:
-            print ' you need to set the data directory first with set_data [dir]'
-            return
-        else:
-            self.obs.load_model(directory, epoch, self.data_dir)
+        self.net_interactor.load_model(directory, epoch, self.patch_dir, self.dataset_dir)
 
     def do_ping(self, args):
         """ping [patch (optional)] if patch is present queries the network for this patch. otherwise queries a random patch"""
@@ -117,41 +174,41 @@ class Interpreter(cmd.Cmd):
             patch = None
         else:
             patch = args
-        image_file, label, pred, channels = self.obs.get_single_prediction(patch_name=patch)
+        image_file, label, pred, channels = self.net_interactor.get_single_prediction(patch_name=patch)
         plt.ion()
-        self.obs.show_single_prediction(image_file, label, pred, channels)
+        self.net_interactor.show_single_prediction(image_file, label, pred, channels)
 
     def do_net(self, args):
         """net: shows the structure of the current network"""
-        self.obs.show_network_model();
+        self.net_interactor.show_network_model();
 
     def do_peek(self, args):
         """peek [directory] [epoch] :  oads a sample panel for the given directory and epoch"""
         if (len(args.split()) != 2):
-            if self.obs.directory is None and self.obs.epoch is None:
+            if self.net_interactor.directory is None and self.net_interactor.state is None:
                 print 'Wrong number of paramters. [directory] [epoch] expected.'
                 return
         else:
             directory, epoch = args.split()
             epoch = int(epoch)
-            if self.data_dir == None:
+            if self.patch_dir == None:
                 print 'You need to set the data directory first with set_data [dir]'
                 return
             else:
                 try:
-                    self.obs.load_model(directory, epoch, self.data_dir)
+                    self.net_interactor.load_model(directory, epoch, self.patch_dir)
                 except Exception as e:
                     print e.message
                     return
 
 
-        self.obs.setup_panel()
+        self.net_interactor.setup_panel()
         self.do_rand(None)
 
     def do_rand(self, args):
         """rand : loads a random sample of patches, queries the network and displays the ground truth (GT) and the prediction
                 PR in the panel"""
-        obs = self.obs
+        obs = self.net_interactor
         plt.ion()
         obs.get_inputs()
         obs.get_predictions()
@@ -167,9 +224,9 @@ class Interpreter(cmd.Cmd):
             return
 
         epoch = int(args)
-        obs = self.obs
+        obs = self.net_interactor
         try:
-            obs.load_model(obs.directory, epoch, self.data_dir)
+            obs.load_model(obs.directory, epoch, self.patch_dir)
         except:
             print 'Error'
             return
@@ -180,7 +237,7 @@ class Interpreter(cmd.Cmd):
 
     def do_next(self, args):
         """next: Shows the next epoch in the animation"""
-        obs = self.obs
+        obs = self.net_interactor
         obs.next_epoch()
         obs.get_predictions()
         obs.show_predictions()
@@ -199,12 +256,12 @@ class Interpreter(cmd.Cmd):
             print 'Wrong number of parameters please check'
             return
 
-        if self.data_dir == None:
+        if self.patch_dir == None:
             print 'You need to set the data directory first with set_data [dir]'
             return
 
 
-        obs = self.obs
+        obs = self.net_interactor
         directory, start, stop, step = args.split()
         start = int(start)
         stop = int(stop)
@@ -218,15 +275,15 @@ class Interpreter(cmd.Cmd):
             return
 
 
-        folder = self.locations.MOVIE_DIR + ('/%s_%d_%d_%d_%s'%(directory, start, stop, step, self.data_dir))
+        folder = self.locations.MOVIE_DIR + ('/%s_%d_%d_%d_%s' % (directory, start, stop, step, self.patch_dir))
         self.locations.check_dir_of(folder + '/dummy')
 
-        obs = self.obs
+        obs = self.net_interactor
         obs.verbose = False
-        obs.set_animation_params(directory, start, stop, step, self.data_dir)
+        obs.set_animation_params(directory, start, stop, step, self.patch_dir)
 
         plt.ion()
-        self.obs.setup_panel()
+        self.net_interactor.setup_panel()
         obs.get_inputs()
         obs.show_labels()
         plt.tight_layout()
@@ -259,7 +316,9 @@ class Interpreter(cmd.Cmd):
 
         try:
             self.net_test.load_data(subject, slice)
-            self.net_test.load_network(self.obs.directory, self.obs.epoch, self.data_dir)
+            self.net_test.load_network(self.net_interactor.directory,
+                                       self.net_interactor.state,
+                                       self.dataset_dir)
             self.net_test.set_window(28)  #hard code. Patches are 28x28
             self.net_test.set_blend(blend)
             self.net_test.go()
@@ -282,5 +341,6 @@ class Interpreter(cmd.Cmd):
 if __name__ == '__main__':
     cfile = dh_config_selector()
     i = Interpreter(cfile)
+    i.load_defaults_from_config()
     i.do_man(None)
     i.cmdloop()

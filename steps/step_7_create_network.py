@@ -11,7 +11,8 @@ from deephisto.net import NetBuilder_fcn8
 
 def main():
     #config = dh_read_config('/home/dcantor/projects/deephisto/code/config_neuronal_density.ini')
-    config = dh_read_config('/home/dcantor/projects/deephisto/code/config_field_fraction.ini')
+    #config = dh_read_config('/home/dcantor/projects/deephisto/code/config_field_fraction.ini')
+    config = dh_read_config('/home/dcantor/projects/deephisto/code/config_neuronal_density_rt.ini')
     net = NetBuilder_fcn8(config)
     net.make()
 

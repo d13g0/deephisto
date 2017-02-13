@@ -146,6 +146,10 @@ class Config:
         return self.data['network']['network_dir']
 
     @property
+    def NETWORK_WEIGHTS(self):
+        return self.data['network']['network_weights']
+
+    @property
     def TRAINING_PROTO(self):
         return self.data['network']['training_proto']
     @property
@@ -225,8 +229,6 @@ def dh_read_config(filename):
             for item in results:
                 key,value = item
                 parser.set(section,key,value)
-            print
-
 
     iteration()
     count = 0
@@ -239,6 +241,8 @@ def dh_read_config(filename):
 
 
     config = _setup_config_object(parser)
+    print
+    print
     print 'Study %s'%config.STUDY_NAME
     print '-------------------------------'
     print

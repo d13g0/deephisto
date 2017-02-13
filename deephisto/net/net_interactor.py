@@ -30,7 +30,7 @@ class NetInteractor:
         self.predictions = None
         self.net = None
         self.directory = None
-        self.epoch = None
+        self.state = None
         self.start = None
         self.end = None
         self.step = None
@@ -41,26 +41,26 @@ class NetInteractor:
         self.training_data = None
         self.training_labels = None
         self.mean = None
-        self.patchdir_name = None
+        self.patch_dir = None
         self.PANEL_ROWS = 5
         self.PANEL_COLS = 4
         self.verbose = True
         self.training_subjects = None
         self.validation_subjects = None
 
-    def load_lists(self, patchdir_name=None):
+    def load_dataset_metadata(self, dataset_dir=None):
 
-        if patchdir_name == None:
-            patchdir_name = self.patchdir_name
+        if dataset_dir == None:
+            dataset_dir = self.config.DATASET_DIR
 
-        datafile = os.path.join(os.path.dirname(self.config.DATASET_DIR),'%s' % patchdir_name, 'validation.txt')
+        datafile = os.path.join(dataset_dir, 'validation.txt')
 
         with open(datafile, 'r') as dfile:
             lines = dfile.read().splitlines()
             self.validation_data = [f.split(';')[0] for f in lines]
             self.validation_labels = [f.split(';')[1] for f in lines]
 
-        datafile = os.path.join(os.path.dirname(self.config.DATASET_DIR), '%s' % patchdir_name, 'training.txt')
+        datafile = os.path.join(dataset_dir, 'training.txt')
         with open(datafile, 'r') as dfile:
             lines = dfile.read().splitlines()
             self.training_data = [f.split(';')[0] for f in lines]
@@ -71,7 +71,7 @@ class NetInteractor:
 
 
     def load_avg_image(self):
-        avg_img_file = os.path.join(os.path.dirname(self.config.DATASET_DIR), self.patchdir_name, 'training_average.png')
+        avg_img_file = os.path.join(self.dataset_dir, 'training_average.png')
         self.mean = np.array(Image.open(avg_img_file))
         print 'Average training image %s loaded'%avg_img_file
 
@@ -93,30 +93,32 @@ class NetInteractor:
             print '  end             :%d'%end
             print '  step            :%d'%step
 
-    def load_model(self, directory, epoch, data_dir):
+    def load_model(self, directory, state, patch_dir, dataset_dir):
         """
         :param directory: The directory where the net trained .caffemodels exist
-        :param epoch:  the index X of the file __iter__X__.caffemodel to be used
-        :param data_dir: location under SPLIT_DIR and PATCH_DIR to look for data (must be the same name)
+        :param state:  the index X of the file __iter__X__.caffemodel to be used
+        :param patch_dir: location of the patches
+        :param dataset_dir: location of the dataset info
         """
         self.directory = directory
-        self.epoch = epoch
-        self.patchdir_name = data_dir
+        self.state = state
+        self.patch_dir = patch_dir
+        self.dataset_dir = dataset_dir
 
         #loads the average image annd the validation and training lists from the
         #respective subdirectory under CaffeLocations.SPLIT_DIR
         self.load_avg_image()
-        self.load_lists()
+        self.load_dataset_metadata()
 
         #loads the  net network (deploy.prototxt) with the respective weights
         #ready to make predictions
-        weights = os.path.join(self.config.ROOT, 'caffe','data',directory,'_iter_%d.caffemodel'%epoch)
-        model = os.path.join(self.config.ROOT,'caffe','net',directory,'deploy.prototxt')
+        weights = os.path.join(os.path.dirname(self.config.NETWORK_WEIGHTS), directory,'_iter_%d.caffemodel' % state)
+        model = os.path.join(os.path.dirname(self.config.NETWORK_DIR), directory,'deploy.prototxt')
 
         self.net = caffe.Net(model, caffe.TEST, weights=weights)
 
         if self.verbose:
-            print 'directory: %s epoch: %s  data:%s' % (directory, epoch, data_dir)
+            print 'Network: %s Iteration: %s loaded' % (directory, state)
 
     def show_network_model(self):
         net = self.net
@@ -153,8 +155,8 @@ class NetInteractor:
             # if not specific patch is sought. Then get a random one from the validation list
             N = len(self.validation_data)
             idx = np.random.randint(0, N - 1)
-            image_file = os.path.join(os.path.dirname(self.config.PATCH_DIR), self.patchdir_name, self.validation_data[idx])
-            label_file = os.path.join(os.path.dirname(self.config.PATCH_DIR), self.patchdir_name,
+            image_file = os.path.join(os.path.dirname(self.config.PATCH_DIR), self.patch_dir, self.validation_data[idx])
+            label_file = os.path.join(os.path.dirname(self.config.PATCH_DIR), self.patch_dir,
                                       self.validation_labels[idx])
 
         else:
@@ -179,8 +181,8 @@ class NetInteractor:
             else:
                 raise Exception('%s does not exist' % patch_name)
 
-            image_file = os.path.join(os.path.dirname(self.config.PATCH_DIR), self.patchdir_name, image_file)
-            label_file = os.path.join(os.path.dirname(self.config.PATCH_DIR), self.patchdir_name, label_file)
+            image_file = os.path.join(os.path.dirname(self.config.PATCH_DIR), self.patch_dir, image_file)
+            label_file = os.path.join(os.path.dirname(self.config.PATCH_DIR), self.patch_dir, label_file)
             idx = None
 
 
@@ -251,8 +253,8 @@ class NetInteractor:
         COLS = self.PANEL_COLS
         plt.ion()
         fig, ax = plt.subplots(ROWS, COLS * 2,  squeeze=False, facecolor='black', figsize=(12,8))
-        fig.canvas.set_window_title('DeepHisto Training [dir: %s, epoch: %d]' % (self.directory, self.epoch))
-        fig.suptitle('DeepHisto Training [dir: %s, epoch: %d]' % (self.directory, self.epoch))
+        fig.canvas.set_window_title('DeepHisto Training [dir: %s, epoch: %d]' % (self.directory, self.state))
+        fig.suptitle('DeepHisto Training [dir: %s, epoch: %d]' % (self.directory, self.state))
 
         for i, j in product(range(0,  ROWS), range(0, COLS*2)):
             k = j*ROWS + i
@@ -296,8 +298,8 @@ class NetInteractor:
 
         assert len(self.predictions) == N, 'number of predictions need to match the dimensions of the panel'
 
-        self.fig.canvas.set_window_title('DeepHisto Training [dir: %s, epoch: %d]' % (self.directory, self.epoch))
-        self.fig.suptitle('%d' % self.epoch, fontsize=22, color='white')
+        self.fig.canvas.set_window_title('DeepHisto Training [dir: %s, epoch: %d]' % (self.directory, self.state))
+        self.fig.suptitle('%d' % self.state, fontsize=22, color='white')
 
         ax = self.ax
         for i, j in product(range(0, ROWS), range(0, COLS)):
@@ -391,18 +393,18 @@ class NetInteractor:
         return formatter
 
     def next_epoch(self, loop=False):
-        epoch = self.epoch
+        epoch = self.state
         step = self.step
         end = self.end
         if (epoch + step > end):
             if loop:
-                self.epoch = self.start
+                self.state = self.start
                 return True
             else:
                 return False
 
-        self.epoch = epoch + step
-        self.load_model(self.directory, self.epoch, self.patchdir_name)
+        self.state = epoch + step
+        self.load_model(self.directory, self.state, self.patch_dir)
         return True
 
 

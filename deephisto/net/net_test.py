@@ -22,9 +22,10 @@ class NetTest:
     BLEND_MODES = [BLEND_MEAN, BLEND_MAX, BLEND_MEDIAN, BLEND_MODE, BLEND_MODE_MAX ]
 
 
-    def __init__(self, locations):
+    def __init__(self, config):
+        self.config = config
         caffe.set_mode_gpu()
-        self.utils = ImageUtils(locations)
+        self.utils = ImageUtils(config)
         self.subject = None
         self.index = None
         self.WSIZE = None
@@ -64,20 +65,20 @@ class NetTest:
         self.input = self.input.astype(np.uint8)
         self.input_image = Image.fromarray(self.input)
 
-    def load_network(self, directory, epoch, split_dir):
+    def load_network(self, directory, state, dataset_dir):
 
         self.directory = directory
-        self.epoch = epoch
+        self.state = state
 
-        model = CaffeSettings.SNAPSHOT_DIR % (directory, epoch)
+        weights = os.path.join(os.path.dirname(self.config.NETWORK_WEIGHTS), directory, '_iter_%d.caffemodel' % state)
+        model = os.path.join(os.path.dirname(self.config.NETWORK_DIR), directory, 'deploy.prototxt')
         print 'Loading %s' % model
-
-        #load network from 'directory'
-        net_def = CaffeSettings.NET_DIR + '/' + directory + '/' + CaffeSettings.DEPLOY_PROTO
-        self.net = caffe.Net(net_def, caffe.TEST, weights=model)
+        self.net = caffe.Net(model, caffe.TEST, weights=weights)
+        print 'OK'
+        print
 
         #load mean to preprocess samples form 'data_dir'
-        avg_img_file = CaffeSettings.SPLIT_DIR + '/' + split_dir + '/' + CaffeSettings.AVG_IMG
+        avg_img_file = os.path.join(dataset_dir, 'training_average.png')
         self.mean = np.array(Image.open(avg_img_file))
 
 
@@ -89,7 +90,7 @@ class NetTest:
 
         plt.ion()
         fig, ax = plt.subplots(1, 3, facecolor='black', figsize=(14, 4), sharex=True, sharey=True)
-        fig.canvas.set_window_title('%s - %d Subject: %s  [%s]  (%s)' % (self.directory, self.epoch, self.subject, self.index, self.BMODE.upper()))
+        fig.canvas.set_window_title('%s - %d Subject: %s  [%s]  (%s)' % (self.directory, self.state, self.subject, self.index, self.BMODE.upper()))
 
         for x in ax:
             x.get_xaxis().set_visible(False)
@@ -101,12 +102,12 @@ class NetTest:
 
         ax[1].set_axis_bgcolor('black')
         ax[1].set_title('ground truth', color='white')
-        ax[1].imshow(self.hist_flat, cmap='jet', interpolation='None', vmin=0, vmax=CaffeSettings.NUM_LABELS)
+        ax[1].imshow(self.hist_flat, cmap='jet', interpolation='None', vmin=0, vmax=self.config.NUM_LABELS)
         ax[1].format_coord = self._get_formatter('Ground Truth', self.hist_flat)
 
         ax[2].set_axis_bgcolor('black')
         ax[2].set_title('prediction', color='white')
-        self.plot_img = ax[2].imshow(np.zeros(shape=self.mask.shape), interpolation='None', cmap='jet', vmin=0, vmax=CaffeSettings.NUM_LABELS)
+        self.plot_img = ax[2].imshow(np.zeros(shape=self.mask.shape), interpolation='None', cmap='jet', vmin=0, vmax=self.config.NUM_LABELS)
 
 
         self.rect = ppa.Rectangle((0, 0), self.WSIZE, self.WSIZE, linewidth=1, edgecolor='#ff0000', facecolor='none', alpha=0.5)
@@ -120,7 +121,7 @@ class NetTest:
 
     def new_pass(self):
         self.target = Image.fromarray(np.zeros(shape=self.mask.shape[0:2]))
-        self.plot_img = self.ax[2].imshow(np.zeros(shape=self.mask.shape), interpolation='None', cmap='jet', vmin=0, vmax=CaffeSettings.NUM_LABELS)
+        self.plot_img = self.ax[2].imshow(np.zeros(shape=self.mask.shape), interpolation='None', cmap='jet', vmin=0, vmax=self.config.NUM_LABELS)
 
     def update_pass(self, x, y, data):
 
@@ -295,7 +296,7 @@ class NetTest:
 
 
         fig, ax = plt.subplots(1,6,figsize=(12,3),sharex=True, sharey=True,facecolor='black')
-        fig.canvas.set_window_title('%s - %d Subject: %s  [%s]' % (self.directory, self.epoch, self.subject, self.index))
+        fig.canvas.set_window_title('%s - %d Subject: %s  [%s]' % (self.directory, self.state, self.subject, self.index))
         titles = ['Ground Truth','Median','Mode','Max','Mean','Mode + Max']
         images = [self.hist_flat,median,mode,maximum,mean, blend]
 
